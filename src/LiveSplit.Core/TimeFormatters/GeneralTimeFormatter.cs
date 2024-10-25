@@ -36,6 +36,16 @@ public class GeneralTimeFormatter : ITimeFormatter
     /// </summary>
     public bool AutomaticPrecision { get; set; } = false;
 
+    /// <summary>
+    /// If true, uses a custom formatter on delta times
+    /// The custom formatting rules are as follows:
+    /// If delta time is between -10 seconds ahead to +10 seconds behind, display hundredths place                                                      ie. +4.67
+    /// If delta time is between -60 seconds ahead to -10 seconds ahead or between +60 seconds behind to +10 seconds behind, display tenths place       ie. -34.7
+    /// If delta time is anything else, display no decimal place                                                                                        ie. +3:54
+    /// This formatter essentially keeps delta times the same length by omitting decimal places from the delta time as the it either increases or decreases
+    /// </summary>
+    public bool UseCustomDeltaFormatter { get; set; } = false;
+
     public GeneralTimeFormatter()
     {
         DigitsFormat = DigitsFormat.SingleDigitSeconds;
@@ -105,25 +115,43 @@ public class GeneralTimeFormatter : ITimeFormatter
         }
         else
         {
-            if (DropDecimals && time.TotalMinutes >= 1)
+            if (!UseCustomDeltaFormatter)
             {
-                decimalFormat = "";
+                if (DropDecimals && time.TotalMinutes >= 1)
+                {
+                    decimalFormat = "";
+                }
+                else if (Accuracy == TimeAccuracy.Seconds)
+                {
+                    decimalFormat = "";
+                }
+                else if (Accuracy == TimeAccuracy.Tenths)
+                {
+                    decimalFormat = @"\.f";
+                }
+                else if (Accuracy == TimeAccuracy.Hundredths)
+                {
+                    decimalFormat = @"\.ff";
+                }
+                else if (Accuracy == TimeAccuracy.Milliseconds)
+                {
+                    decimalFormat = @"\.fff";
+                }
             }
-            else if (Accuracy == TimeAccuracy.Seconds)
+            else
             {
-                decimalFormat = "";
-            }
-            else if (Accuracy == TimeAccuracy.Tenths)
-            {
-                decimalFormat = @"\.f";
-            }
-            else if (Accuracy == TimeAccuracy.Hundredths)
-            {
-                decimalFormat = @"\.ff";
-            }
-            else if (Accuracy == TimeAccuracy.Milliseconds)
-            {
-                decimalFormat = @"\.fff";
+                if (time.TotalSeconds >= 60)
+                {
+                    decimalFormat = "";
+                }
+                else if (time.TotalSeconds >= 10)
+                {
+                    decimalFormat = @"\.f";
+                }
+                else
+                {
+                    decimalFormat = @"\.ff";
+                }
             }
         }
 

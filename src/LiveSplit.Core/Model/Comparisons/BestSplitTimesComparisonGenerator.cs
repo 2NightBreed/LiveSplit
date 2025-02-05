@@ -9,6 +9,7 @@ public class BestSplitTimesComparisonGenerator : IComparisonGenerator
 {
     public IRun Run { get; set; }
     public const string ComparisonName = "Best Split Times";
+    public const string ShortComparisonName = "BST";
     public string Name => ComparisonName;
 
     public BestSplitTimesComparisonGenerator(IRun run)

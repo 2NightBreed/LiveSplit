@@ -7,5 +7,6 @@ public class DeltaTimeFormatter : GeneralTimeFormatter
         Accuracy = TimeAccuracy.Tenths;
         DropDecimals = true;
         ShowPlus = true;
+        UseCustomDeltaTimeFormatter = true;
     }
 }

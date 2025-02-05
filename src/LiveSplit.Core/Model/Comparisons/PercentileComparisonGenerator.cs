@@ -12,7 +12,7 @@ public class PercentileComparisonGenerator : IComparisonGenerator
 {
     public IRun Run { get; set; }
     public const string ComparisonName = "Balanced PB";
-    public const string ShortComparisonName = "Balanced";
+    public const string ShortComparisonName = "BPB";
     public virtual string Name => ComparisonName;
     public const double Weight = 0.9375;
 

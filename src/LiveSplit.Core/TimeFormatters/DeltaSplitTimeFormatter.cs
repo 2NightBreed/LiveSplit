@@ -8,5 +8,6 @@ public class DeltaSplitTimeFormatter : GeneralTimeFormatter
         DropDecimals = dropDecimals;
         NullFormat = NullFormat.Dash;
         ShowPlus = true;
+        UseCustomDeltaTimeFormatter = true;
     }
 }

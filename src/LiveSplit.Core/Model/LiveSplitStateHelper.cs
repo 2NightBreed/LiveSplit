@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Drawing;
+using System.Drawing.Imaging;
 
 using LiveSplit.Model.Comparisons;
 using LiveSplit.UI;
@@ -241,5 +242,36 @@ public static class LiveSplitStateHelper
         }
 
         return state.LayoutSettings.BestSegmentColor;
+    }
+
+    /// <summary>
+    /// Takes an image and returns it as a grayscaled image.
+    /// </summary>
+    /// <param name="image">The image to grayscale.</param>
+    /// <returns>Returns the grayscaled image</returns>
+    public static Image ConvertImageToGrayscale(Image image)
+    {
+        Image grayscaleImage = new Bitmap(image.Width, image.Height, image.PixelFormat);
+
+        var attributes = new ImageAttributes();
+        var grayscaleMatrix = new ColorMatrix([
+            [0.299f, 0.299f, 0.299f, 0, 0],
+            [0.587f, 0.587f, 0.587f, 0, 0],
+            [0.114f, 0.114f, 0.114f, 0, 0],
+            [0, 0, 0, 1, 0],
+            [0, 0, 0, 0, 1],
+        ]);
+        attributes.SetColorMatrix(grayscaleMatrix);
+
+        using (var g = Graphics.FromImage(grayscaleImage))
+        {
+            g.DrawImage(image,
+                new Rectangle(0, 0, grayscaleImage.Width, grayscaleImage.Height),
+                0, 0, grayscaleImage.Width, grayscaleImage.Height,
+                GraphicsUnit.Pixel,
+                attributes);
+        }
+
+        return grayscaleImage;
     }
 }

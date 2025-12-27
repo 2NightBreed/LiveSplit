@@ -36,6 +36,16 @@ public class GeneralTimeFormatter : ITimeFormatter
     /// </summary>
     public bool AutomaticPrecision { get; set; } = false;
 
+    /// <summary>
+    /// If true, uses a custom formatter on delta times
+    /// The custom formatting rules are as follows:
+    /// If delta time is between -10 seconds ahead to +10 seconds behind, display hundredths place                                                      ie. +4.67
+    /// If delta time is between -60 seconds ahead to -10 seconds ahead or between +60 seconds behind to +10 seconds behind, display tenths place       ie. -34.7
+    /// If delta time is anything else, display no decimal place                                                                                        ie. +3:54
+    /// This formatter essentially keeps delta times the same length by omitting decimal places from the time as it either increases or decreases
+    /// </summary>
+    public bool UseCustomDeltaTimeFormatter { get; set; }
+
     public GeneralTimeFormatter()
     {
         DigitsFormat = DigitsFormat.SingleDigitSeconds;
@@ -105,26 +115,7 @@ public class GeneralTimeFormatter : ITimeFormatter
         }
         else
         {
-            if (DropDecimals && time.TotalMinutes >= 1)
-            {
-                decimalFormat = "";
-            }
-            else if (Accuracy == TimeAccuracy.Seconds)
-            {
-                decimalFormat = "";
-            }
-            else if (Accuracy == TimeAccuracy.Tenths)
-            {
-                decimalFormat = @"\.f";
-            }
-            else if (Accuracy == TimeAccuracy.Hundredths)
-            {
-                decimalFormat = @"\.ff";
-            }
-            else if (Accuracy == TimeAccuracy.Milliseconds)
-            {
-                decimalFormat = @"\.fff";
-            }
+            decimalFormat = GetDecimalFormat(time);
         }
 
         string formatted;
@@ -170,6 +161,50 @@ public class GeneralTimeFormatter : ITimeFormatter
         }
 
         return formatted;
+    }
+
+    private string GetDecimalFormat(TimeSpan time)
+    {
+        if (UseCustomDeltaTimeFormatter)
+        {
+            if (time.TotalSeconds >= 60)
+            {
+                return "";
+            }
+            else if (time.TotalSeconds >= 10)
+            {
+                return @"\.f";
+            }
+            else
+            {
+                return @"\.ff";
+            }
+        }
+        else
+        {
+            if (DropDecimals && time.TotalMinutes >= 1)
+            {
+                return "";
+            }
+            else if (Accuracy == TimeAccuracy.Seconds)
+            {
+                return "";
+            }
+            else if (Accuracy == TimeAccuracy.Tenths)
+            {
+                return @"\.f";
+            }
+            else if (Accuracy == TimeAccuracy.Hundredths)
+            {
+                return @"\.ff";
+            }
+            else if (Accuracy == TimeAccuracy.Milliseconds)
+            {
+                return @"\.fff";
+            }
+        }
+
+        return @"\.ff";
     }
 
     private string ZeroWithAccuracy()

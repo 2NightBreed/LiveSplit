@@ -11,6 +11,7 @@ namespace LiveSplit.Model;
 public class Segment : ISegment
 {
     public Image Icon { get; set; }
+    public Image LastSubsplitIcon { get; set; }
     public string Name { get; set; }
     public Time PersonalBestSplitTime
     {

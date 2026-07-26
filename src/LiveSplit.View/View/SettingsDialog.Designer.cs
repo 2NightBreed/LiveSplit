@@ -84,6 +84,7 @@ namespace LiveSplit.View
             this.lblServerInit = new System.Windows.Forms.Label();
             this.lblServerPort = new System.Windows.Forms.Label();
             this.txtServerPort = new System.Windows.Forms.TextBox();
+            this.chkDisableAutomaticCheckForUpdates = new System.Windows.Forms.CheckBox();
             this.btnOK = new System.Windows.Forms.Button();
             this.btnCancel = new System.Windows.Forms.Button();
             this.ttpEnableDPIAwarenessInfo = new System.Windows.Forms.ToolTip(this.components);
@@ -122,10 +123,11 @@ namespace LiveSplit.View
             this.tableLayoutPanel1.Controls.Add(this.chkWarnOnReset, 1, 1);
             this.tableLayoutPanel1.Controls.Add(this.panelRefreshRate, 0, 7);
             this.tableLayoutPanel1.Controls.Add(this.grpServerSettings, 0, 6);
+            this.tableLayoutPanel1.Controls.Add(this.chkDisableAutomaticCheckForUpdates, 0, 8);
             this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
-            this.tableLayoutPanel1.RowCount = 8;
+            this.tableLayoutPanel1.RowCount = 9;
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 29F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 29F));
@@ -134,8 +136,8 @@ namespace LiveSplit.View
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 29F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 29F));
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(422, 691);
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 29F));
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(422, 720);
             this.tableLayoutPanel1.TabIndex = 0;
             // 
             // btnChooseRaceProvider
@@ -767,10 +769,25 @@ namespace LiveSplit.View
             this.txtServerPort.TabIndex = 1;
             this.txtServerPort.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             // 
+            // chkDisableAutomaticCheckForUpdates
+            // 
+            this.chkDisableAutomaticCheckForUpdates.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this.chkDisableAutomaticCheckForUpdates.AutoSize = true;
+            this.chkDisableAutomaticCheckForUpdates.Checked = true;
+            this.chkDisableAutomaticCheckForUpdates.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.tableLayoutPanel1.SetColumnSpan(this.chkDisableAutomaticCheckForUpdates, 2);
+            this.chkDisableAutomaticCheckForUpdates.Location = new System.Drawing.Point(3, 691);
+            this.chkDisableAutomaticCheckForUpdates.Name = "chkDisableAutomaticCheckForUpdates";
+            this.chkDisableAutomaticCheckForUpdates.Padding = new System.Windows.Forms.Padding(7, 3, 3, 3);
+            this.chkDisableAutomaticCheckForUpdates.Size = new System.Drawing.Size(335, 23);
+            this.chkDisableAutomaticCheckForUpdates.TabIndex = 22;
+            this.chkDisableAutomaticCheckForUpdates.Text = "Disable Automatic Check For Updates";
+            this.chkDisableAutomaticCheckForUpdates.UseVisualStyleBackColor = true;
+            // 
             // btnOK
             // 
             this.btnOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnOK.Location = new System.Drawing.Point(269, 700);
+            this.btnOK.Location = new System.Drawing.Point(269, 729);
             this.btnOK.Name = "btnOK";
             this.btnOK.Size = new System.Drawing.Size(75, 23);
             this.btnOK.TabIndex = 0;
@@ -783,7 +800,7 @@ namespace LiveSplit.View
             this.btnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.btnCancel.Location = new System.Drawing.Point(350, 700);
+            this.btnCancel.Location = new System.Drawing.Point(350, 729);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(75, 23);
             this.btnCancel.TabIndex = 1;
@@ -812,7 +829,7 @@ namespace LiveSplit.View
             this.tableLayoutPanel5.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel5.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 29F));
             this.tableLayoutPanel5.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.tableLayoutPanel5.Size = new System.Drawing.Size(428, 726);
+            this.tableLayoutPanel5.Size = new System.Drawing.Size(428, 755);
             this.tableLayoutPanel5.TabIndex = 1;
             // 
             // panel1
@@ -822,14 +839,14 @@ namespace LiveSplit.View
             this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panel1.Location = new System.Drawing.Point(3, 3);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(422, 691);
+            this.panel1.Size = new System.Drawing.Size(422, 720);
             this.panel1.TabIndex = 1;
             // 
             // SettingsDialog
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(442, 740);
+            this.ClientSize = new System.Drawing.Size(442, 769);
             this.Controls.Add(this.tableLayoutPanel5);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MinimumSize = new System.Drawing.Size(458, 200);
@@ -914,5 +931,6 @@ namespace LiveSplit.View
         private System.Windows.Forms.ComboBox cbxServerStartup;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel5;
         private System.Windows.Forms.Panel panel1;
+        private System.Windows.Forms.CheckBox chkDisableAutomaticCheckForUpdates;
     }
 }

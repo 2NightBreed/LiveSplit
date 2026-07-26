@@ -47,6 +47,7 @@ public class XMLSettingsSaver : ISettingsSaver
         }
 
         CreateSetting(document, parent, "UILanguage", settings.UILanguage ?? string.Empty);
+        CreateSetting(document, parent, "DisableAutomaticCheckForUpdates", settings.DisableAutomaticCheckForUpdates);
 
         XmlElement recentSplits = document.CreateElement("RecentSplits");
         foreach (RecentSplitsFile splitsFile in settings.RecentSplits)

@@ -49,4 +49,5 @@ public interface ISettings : ICloneable
     bool DoubleTapPrevention { get; set; }
     bool EnableDPIAwareness { get; set; }
     string UILanguage { get; set; }
+    bool DisableAutomaticCheckForUpdates { get; set; }
 }

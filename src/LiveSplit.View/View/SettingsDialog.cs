@@ -75,6 +75,11 @@ public partial class SettingsDialog : Form
 
     public string RaceViewer { get => Settings.RaceViewer.Name; set => Settings.RaceViewer = Web.SRL.RaceViewer.FromName(value); }
 
+    public bool DisableAutomaticCheckForUpdates {
+        get => Settings.DisableAutomaticCheckForUpdates;
+        set => Settings.DisableAutomaticCheckForUpdates = value;
+    }
+
     public SettingsDialog(CompositeHook hook, ISettings settings, string hotkeyProfile)
     {
         InitializeComponent();
@@ -95,6 +100,7 @@ public partial class SettingsDialog : Form
         txtRefreshRate.DataBindings.Add("Text", this, "RefreshRate");
         txtServerPort.DataBindings.Add("Text", this, "ServerPort");
         cbxServerStartup.SelectedIndex = (int)Settings.ServerStartup;
+        chkDisableAutomaticCheckForUpdates.DataBindings.Add("Checked", this, "DisableAutomaticCheckForUpdates");
 
         UpdateDisplayedHotkeyValues();
         RefreshRemoveButton();

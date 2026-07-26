@@ -62,6 +62,7 @@ public class XMLSettingsFactory : ISettingsFactory
             && ParseBool(parent["EnableDPIAwareness"], settings.EnableDPIAwareness);
 
         settings.UILanguage = ParseString(parent["UILanguage"], settings.UILanguage);
+        settings.DisableAutomaticCheckForUpdates = ParseBool(parent["DisableAutomaticCheckForUpdates"], settings.DisableAutomaticCheckForUpdates);
 
         if (version >= new Version(1, 3))
         {

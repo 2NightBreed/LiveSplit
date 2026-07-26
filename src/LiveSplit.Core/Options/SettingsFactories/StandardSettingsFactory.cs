@@ -47,6 +47,7 @@ public class StandardSettingsFactory : ISettingsFactory
             ServerState = ServerStateType.Off,
             EnableDPIAwareness = false,
             UILanguage = string.Empty,
+            DisableAutomaticCheckForUpdates = true,
             ComparisonGeneratorStates = new Dictionary<string, bool>()
             {
                 { BestSegmentsComparisonGenerator.ComparisonName, true },

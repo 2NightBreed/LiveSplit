@@ -225,6 +225,7 @@ public partial class RunEditorDialog : Form
         runGrid.CellEndEdit += runGrid_CellEndEdit;
         runGrid.SelectionChanged += runGrid_SelectionChanged;
         runGrid.DataError += runGrid_DataError;
+        runGrid.MouseClick += runGrid_MouseClick;
 
         var iconColumn = new DataGridViewImageColumn
         {
@@ -1232,6 +1233,51 @@ public partial class RunEditorDialog : Form
         e.ThrowException = false;
     }
 
+    private void runGrid_MouseClick(object sender, MouseEventArgs e)
+    {
+        if (e.Button == MouseButtons.Right)
+        {
+            var menu = new ContextMenu();
+            menu.MenuItems.Add(new MenuItem("Insert Last Subsplit Icon"));
+            menu.Show(runGrid, new Point(e.X, e.Y));
+
+            int currentMouseOverRow = runGrid.HitTest(e.X, e.Y).RowIndex;
+            if (string.IsNullOrEmpty(Run[currentMouseOverRow].Name))
+            {
+                MessageBox.Show("Cannot add a last subsplit icon to a split with an empty name!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+                return;
+            }
+
+            if (!Run[currentMouseOverRow].Name.StartsWith("{"))
+            {
+                MessageBox.Show("Cannot add a last subsplit icon to a normal split! Please select a last subsplit!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+                return;
+            }
+
+            bool multiEdit = runGrid.SelectedCells.Count > 1;
+            if (multiEdit)
+            {
+                MessageBox.Show("Cannot add a last subsplit icon when multiple splits are selected! Try selecting only one or no splits!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+                return;
+            }
+
+            var dialog = new OpenFileDialog
+            {
+                Filter = "Image Files|*.BMP;*.JPG;*.GIF;*.JPEG;*.PNG|All files (*.*)|*.*",
+                Title = "Set Last Subsplit Icon for " + Run[currentMouseOverRow].Name + "..."
+            };
+
+            DialogResult result = dialog.ShowDialog();
+            if (result == DialogResult.OK)
+            {
+                ChangeImage(currentMouseOverRow, dialog.FileName, multiEdit, true);
+            }
+        }
+    }
+
     private void runGrid_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
     {
         if (e.ColumnIndex == ICONINDEX && e.RowIndex >= 0 && e.RowIndex < Run.Count)
@@ -1253,7 +1299,7 @@ public partial class RunEditorDialog : Form
         }
     }
 
-    private void ChangeImage(int rowIndex, string fileName, bool multiEdit)
+    private void ChangeImage(int rowIndex, string fileName, bool multiEdit, bool shouldChangeLastSubsplitIcon = false)
     {
         try
         {
@@ -1267,7 +1313,15 @@ public partial class RunEditorDialog : Form
                     ImagesToDispose.Add(oldImage);
                 }
 
-                Run[rowIndex].Icon = image;
+                if (shouldChangeLastSubsplitIcon)
+                {
+                    Run[rowIndex].LastSubsplitIcon = image;
+                }
+                else
+                {
+                    Run[rowIndex].Icon = image;
+                }
+
                 runGrid.NotifyCurrentCellDirty(true);
             }
             else

@@ -39,9 +39,9 @@ public static class RunExtensions
         return run.AutoSplitter is { IsActivated: true };
     }
 
-    public static void AddSegment(this IRun run, string name, Time pbSplitTime = default, Time bestSegmentTime = default, Image icon = null, Time splitTime = default, SegmentHistory segmentHistory = null)
+    public static void AddSegment(this IRun run, string name, Time pbSplitTime = default, Time bestSegmentTime = default, Image icon = null, Image lastSubsplitIcon = null, Time splitTime = default, SegmentHistory segmentHistory = null)
     {
-        var segment = new Segment(name, pbSplitTime, bestSegmentTime, icon, splitTime);
+        var segment = new Segment(name, pbSplitTime, bestSegmentTime, icon, lastSubsplitIcon, splitTime);
         if (segmentHistory != null)
         {
             segment.SegmentHistory = segmentHistory;

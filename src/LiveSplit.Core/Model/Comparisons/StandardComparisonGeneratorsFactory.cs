@@ -10,6 +10,7 @@ public class StandardComparisonGeneratorsFactory : IComparisonGeneratorsFactory
     {
         AddShortComparisonName(BestSegmentsComparisonGenerator.ComparisonName, BestSegmentsComparisonGenerator.ShortComparisonName);
         AddShortComparisonName(Run.PersonalBestComparisonName, "PB");
+        AddShortComparisonName(BestSplitTimesComparisonGenerator.ComparisonName, BestSplitTimesComparisonGenerator.ShortComparisonName);
         AddShortComparisonName(AverageSegmentsComparisonGenerator.ComparisonName, AverageSegmentsComparisonGenerator.ShortComparisonName);
         AddShortComparisonName(MedianSegmentsComparisonGenerator.ComparisonName, MedianSegmentsComparisonGenerator.ShortComparisonName);
         AddShortComparisonName(WorstSegmentsComparisonGenerator.ComparisonName, WorstSegmentsComparisonGenerator.ShortComparisonName);

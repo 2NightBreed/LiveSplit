@@ -4,15 +4,15 @@
 	branch = master
 [submodule "LiveSplit/Components/LiveSplit.Delta"]
 	path = components/LiveSplit.Delta
-	url = https://github.com/LiveSplit/LiveSplit.Delta.git
+	url = https://github.com/2NightBreed/LiveSplit.Delta.git
 	branch = master
 [submodule "LiveSplit/Components/LiveSplit.DetailedTimer"]
 	path = components/LiveSplit.DetailedTimer
-	url = https://github.com/LiveSplit/LiveSplit.DetailedTimer.git
+	url = https://github.com/2NightBreed/LiveSplit.DetailedTimer.git
 	branch = master
 [submodule "LiveSplit/Components/LiveSplit.Graph"]
 	path = components/LiveSplit.Graph
-	url = https://github.com/LiveSplit/LiveSplit.Graph.git
+	url = https://github.com/2NightBreed/LiveSplit.Graph.git
 	branch = master
 [submodule "LiveSplit/Components/LiveSplit.HotkeyIndicator"]
 	path = components/LiveSplit.HotkeyIndicator
@@ -24,11 +24,11 @@
 	branch = master
 [submodule "LiveSplit/Components/LiveSplit.PossibleTimeSave"]
 	path = components/LiveSplit.PossibleTimeSave
-	url = https://github.com/LiveSplit/LiveSplit.PossibleTimeSave.git
+	url = https://github.com/2NightBreed/LiveSplit.PossibleTimeSave.git
 	branch = master
 [submodule "LiveSplit/Components/LiveSplit.PreviousSegment"]
 	path = components/LiveSplit.PreviousSegment
-	url = https://github.com/LiveSplit/LiveSplit.PreviousSegment.git
+	url = https://github.com/2NightBreed/LiveSplit.PreviousSegment.git
 	branch = master
 [submodule "LiveSplit/Components/LiveSplit.RunPrediction"]
 	path = components/LiveSplit.RunPrediction
@@ -40,11 +40,15 @@
 	branch = master
 [submodule "LiveSplit/Components/LiveSplit.Sound"]
 	path = components/LiveSplit.Sound
-	url = https://github.com/LiveSplit/LiveSplit.Sound.git
+	url = https://github.com/2NightBreed/LiveSplit.Sound.git
 	branch = master
 [submodule "LiveSplit/Components/LiveSplit.Splits"]
 	path = components/LiveSplit.Splits
-	url = https://github.com/LiveSplit/LiveSplit.Splits.git
+	url = https://github.com/2NightBreed/LiveSplit.Splits.git
+	branch = master
+[submodule "LiveSplit/Components/LiveSplit.Subsplits"]
+	path = components/LiveSplit.Subsplits
+	url = https://github.com/2NightBreed/LiveSplit.Subsplits.git
 	branch = master
 [submodule "LiveSplit/Components/LiveSplit.SumOfBest"]
 	path = components/LiveSplit.SumOfBest
@@ -56,11 +60,11 @@
 	branch = master
 [submodule "LiveSplit/Components/LiveSplit.Timer"]
 	path = components/LiveSplit.Timer
-	url = https://github.com/LiveSplit/LiveSplit.Timer.git
+	url = https://github.com/2NightBreed/LiveSplit.Timer.git
 	branch = master
 [submodule "LiveSplit/Components/LiveSplit.Title"]
 	path = components/LiveSplit.Title
-	url = https://github.com/LiveSplit/LiveSplit.Title.git
+	url = https://github.com/2NightBreed/LiveSplit.Title.git
 	branch = master
 [submodule "LiveSplit/Components/LiveSplit.Video"]
 	path = components/LiveSplit.Video
@@ -68,7 +72,7 @@
 	branch = master
 [submodule "LiveSplit/Components/LiveSplit.Subsplits"]
 	path = components/LiveSplit.Subsplits
-	url = https://github.com/LiveSplit/LiveSplit.Subsplits
+	url = https://github.com/2NightBreed/LiveSplit.Subsplits
 [submodule "LiveSplit/Components/LiveSplit.WorldRecord"]
 	path = components/LiveSplit.WorldRecord
 	url = https://github.com/LiveSplit/LiveSplit.WorldRecord.git
@@ -77,7 +81,7 @@
 	url = https://github.com/LiveSplit/SpeedrunComSharp.git
 [submodule "LiveSplit/Components/LiveSplit.TotalPlaytime"]
 	path = components/LiveSplit.TotalPlaytime
-	url = https://github.com/LiveSplit/LiveSplit.TotalPlaytime.git
+	url = https://github.com/2NightBreed/LiveSplit.TotalPlaytime.git
 [submodule "LiveSplit/Components/LiveSplit.Counter"]
 	path = components/LiveSplit.Counter
 	url = https://github.com/LiveSplit/LiveSplit.Counter.git
@@ -93,7 +97,7 @@
 	url = https://github.com/LiveSplit/LiveSplit.AutoSplittingRuntime.git
 [submodule "LiveSplit/Libs/livesplit-core"]
 	path = lib/livesplit-core
-	url = https://github.com/LiveSplit/livesplit-core.git
+	url = https://github.com/2NightBreed/livesplit-core.git
 [submodule "LiveSplit/Components/LiveSplit.TheRun"]
 	path = components/LiveSplit.TheRun
 	url = https://github.com/therungg/LiveSplit.TheRun

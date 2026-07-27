@@ -19,15 +19,15 @@ public class StandardSettingsFactory : ISettingsFactory
             {
                 {HotkeyProfile.DefaultHotkeyProfileName, new HotkeyProfile()
                     {
-                        SplitKey = new KeyOrButton(Keys.NumPad1),
-                        ResetKey = new KeyOrButton(Keys.NumPad3),
-                        UndoKey = new KeyOrButton(Keys.NumPad8),
-                        SkipKey = new KeyOrButton(Keys.NumPad2),
-                        SwitchComparisonPrevious = new KeyOrButton(Keys.NumPad4),
-                        SwitchComparisonNext = new KeyOrButton(Keys.NumPad6),
+                        SplitKey = new KeyOrButton(Keys.ControlKey),
+                        ResetKey = new KeyOrButton(Keys.Delete),
+                        UndoKey = new KeyOrButton(Keys.Left),
+                        SkipKey = new KeyOrButton(Keys.Right),
+                        SwitchComparisonPrevious = new KeyOrButton(Keys.Up),
+                        SwitchComparisonNext = new KeyOrButton(Keys.Down),
                         PauseKey = null,
-                        ToggleGlobalHotkeys = null,
-                        GlobalHotkeysEnabled = false,
+                        ToggleGlobalHotkeys = new KeyOrButton(Keys.Oemtilde),
+                        GlobalHotkeysEnabled = true,
                         DeactivateHotkeysForOtherPrograms = false,
                         DoubleTapPrevention = true,
                         AllowGamepadsAsHotkeys = false,
@@ -41,7 +41,7 @@ public class StandardSettingsFactory : ISettingsFactory
             AgreedToSRLRules = false,
             SimpleSumOfBest = false,
             RaceProvider = [.. ComponentManager.RaceProviderFactories.Values.ToList().Select(x => x.CreateSettings())],
-            RefreshRate = 40,
+            RefreshRate = 60,
             ServerPort = 16834,
             ServerStartup = ServerStartupType.Off,
             ServerState = ServerStateType.Off,
@@ -50,14 +50,14 @@ public class StandardSettingsFactory : ISettingsFactory
             ComparisonGeneratorStates = new Dictionary<string, bool>()
             {
                 { BestSegmentsComparisonGenerator.ComparisonName, true },
-                { BestSplitTimesComparisonGenerator.ComparisonName, false },
+                { BestSplitTimesComparisonGenerator.ComparisonName, true },
                 { AverageSegmentsComparisonGenerator.ComparisonName, true },
-                { MedianSegmentsComparisonGenerator.ComparisonName, false },
-                { WorstSegmentsComparisonGenerator.ComparisonName, false},
-                { PercentileComparisonGenerator.ComparisonName, false },
-                { LatestRunComparisonGenerator.ComparisonName, false },
-                { HCPComparisonGenerator.ComparisonName, false },
-                { NoneComparisonGenerator.ComparisonName, false }
+                { MedianSegmentsComparisonGenerator.ComparisonName, true },
+                { WorstSegmentsComparisonGenerator.ComparisonName, true},
+                { PercentileComparisonGenerator.ComparisonName, true },
+                { LatestRunComparisonGenerator.ComparisonName, true },
+                { HCPComparisonGenerator.ComparisonName, true },
+                { NoneComparisonGenerator.ComparisonName, true }
             },
             HcpHistorySize = 20,
             HcpNBestRuns = 8

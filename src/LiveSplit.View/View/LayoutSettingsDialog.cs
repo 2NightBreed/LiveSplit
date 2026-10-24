@@ -171,41 +171,27 @@ public partial class LayoutSettingsDialog : Form
             Name = name,
         };
 
-        // Add the page to the tab control first so it has the real ClientSize
-        // before children Anchor against it. Without this, Anchor=Right is
-        // computed against the unparented TabPage default (~200 px) and the
-        // child stays narrow until something else forces re-layout.
         tabControl.TabPages.Add(page);
 
         var fontPanel = new FontOverridePanel();
         fontPanel.Bind(fontOverrides, Layout.Settings, usedFonts);
         fontPanel.Location = new Point(0, 0);
-
-        // Stretch fontPanel across the TabPage width instead of pinning it
-        // to settingsControl.Width. Some Settings designers are 459 px wide
-        // (Splits / DetailedTimer / Subsplits) while the TabPage interior is
-        // ~478 px — pinning to 459 leaves a visible ~19 px gap on the right
-        // and makes those tabs look "weirdly spaced" relative to other tabs.
-        fontPanel.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-        // Clear the default 3-px Margin so the panel doesn't contribute extra
-        // horizontal extent and spuriously trigger the horizontal scrollbar
-        // (Anchor=Right already stretches it exactly to the visible width).
+        fontPanel.Width = settingsControl.Width;
+        fontPanel.Anchor = AnchorStyles.Top | AnchorStyles.Left;
         fontPanel.Margin = Padding.Empty;
 
         settingsControl.Dock = DockStyle.None;
         settingsControl.Location = new Point(0, fontPanel.Height);
-        settingsControl.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+        settingsControl.Anchor = AnchorStyles.Top | AnchorStyles.Left;
         settingsControl.Margin = Padding.Empty;
 
         page.Controls.Add(fontPanel);
         page.Controls.Add(settingsControl);
 
-        // Set AutoScrollMinSize.Height to the exact bottom of the settings
-        // control. Width=0 lets WinForms auto-detect horizontal extent from
-        // the (now Margin-less) children, which equals the page client width
-        // and therefore never triggers the horizontal scrollbar.
+        // Preserve designer control widths; only add horizontal scrolling when
+        // a control is wider than the available tab page.
         page.AutoScrollMinSize = new Size(
-            0,
+            Math.Max(fontPanel.Right, settingsControl.Right),
             fontPanel.Height + settingsControl.Height);
 
         EnableMouseWheelForwarding(page);

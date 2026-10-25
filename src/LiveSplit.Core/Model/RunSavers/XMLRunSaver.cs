@@ -84,6 +84,10 @@ public class XMLRunSaver : IRunSaver
 
             CreateSetting(document, splitElement, "Name", segment.Name);
             CreateSetting(document, splitElement, "Icon", segment.Icon);
+            if (segment.LastSubsplitIcon != null)
+            {
+                CreateSetting(document, splitElement, "LastSubsplitIcon", segment.LastSubsplitIcon);
+            }
 
             XmlElement splitTimes = document.CreateElement("SplitTimes");
             foreach (string comparison in run.CustomComparisons)

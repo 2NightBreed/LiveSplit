@@ -10,6 +10,7 @@ namespace LiveSplit.Model;
 public class Segment : ISegment
 {
     public Image Icon { get; set; }
+    public Image LastSubsplitIcon { get; set; }
     public string Name { get; set; }
     public Time PersonalBestSplitTime
     {
@@ -25,7 +26,7 @@ public class Segment : ISegment
     public Segment(
         string name, Time pbSplitTime = default,
         Time bestSegmentTime = default, Image icon = null,
-        Time splitTime = default)
+        Image lastSubsplitIcon = null, Time splitTime = default)
     {
         Comparisons = new CompositeComparisons();
         Name = name;
@@ -33,6 +34,7 @@ public class Segment : ISegment
         BestSegmentTime = bestSegmentTime;
         SplitTime = splitTime;
         Icon = icon;
+        LastSubsplitIcon = lastSubsplitIcon;
         SegmentHistory = [];
         CustomVariableValues = [];
     }
@@ -46,6 +48,7 @@ public class Segment : ISegment
             BestSegmentTime = BestSegmentTime,
             SplitTime = SplitTime,
             Icon = Icon,
+            LastSubsplitIcon = LastSubsplitIcon,
             SegmentHistory = newSegmentHistory,
             CustomVariableValues = CustomVariableValues.ToDictionary(x => x.Key, x => x.Value),
             Comparisons = (IComparisons)Comparisons.Clone()

@@ -36,7 +36,7 @@ public class SegmentMust
 
     private static Segment CreateSubjectUnderTest()
     {
-        return new Segment("any name", AnyPersonalBestSplitTime, AnyBestSegmentTime, AnyBitmap, AnySplitTime);
+        return new Segment("any name", AnyPersonalBestSplitTime, AnyBestSegmentTime, AnyBitmap, AnyBitmap, AnySplitTime);
     }
 
     private static void VerifySegment(Segment sut)

@@ -29,15 +29,16 @@ public partial class RunEditorDialog : Form
     private static string T(string source) => UiLocalizer.Translate(source, LanguageResolver.ResolveCurrentCultureLanguage());
 
     private const int ICONINDEX = 0;
-    private const int SEGMENTNAMEINDEX = 1;
-    private const int SPLITTIMEINDEX = 2;
-    private const int SEGMENTTIMEINDEX = 3;
-    private const int BESTSEGMENTINDEX = 4;
-    private const int CUSTOMCOMPARISONSINDEX = 5;
+    private const int LASTSUBSPLITICONINDEX = 1;
+    private const int SEGMENTNAMEINDEX = 2;
+    private const int SPLITTIMEINDEX = 3;
+    private const int SEGMENTTIMEINDEX = 4;
+    private const int BESTSEGMENTINDEX = 5;
+    private const int CUSTOMCOMPARISONSINDEX = 6;
 
-    private const int HISTORY_SPLITTIMEINDEX = 2;
-    private const int HISTORY_SEGMENTTIMEINDEX = 3;
-    private const int HISTORY_SEGMENTBESTDIFFINDEX = 4;
+    private const int HISTORY_SPLITTIMEINDEX = 3;
+    private const int HISTORY_SEGMENTTIMEINDEX = 4;
+    private const int HISTORY_SEGMENTBESTDIFFINDEX = 5;
 
     private const int MAXADDITIONSPERADDRANGE = 1000;
 
@@ -225,6 +226,7 @@ public partial class RunEditorDialog : Form
         runGrid.CellEndEdit += runGrid_CellEndEdit;
         runGrid.SelectionChanged += runGrid_SelectionChanged;
         runGrid.DataError += runGrid_DataError;
+        runGrid.MouseClick += runGrid_MouseClick;
 
         var iconColumn = new DataGridViewImageColumn
         {
@@ -235,6 +237,16 @@ public partial class RunEditorDialog : Form
         };
         iconColumn.DefaultCellStyle.NullValue = new Bitmap(1, 1);
         runGrid.Columns.Add(iconColumn);
+
+        var lastSubsplitIconColumn = new DataGridViewImageColumn
+        {
+            ImageLayout = DataGridViewImageCellLayout.Zoom,
+            Name = "LSI",
+            Width = 50,
+            AutoSizeMode = DataGridViewAutoSizeColumnMode.None
+        };
+        lastSubsplitIconColumn.DefaultCellStyle.NullValue = new Bitmap(1, 1);
+        runGrid.Columns.Add(lastSubsplitIconColumn);
 
         var column = new DataGridViewTextBoxColumn
         {
@@ -706,6 +718,7 @@ public partial class RunEditorDialog : Form
         if (columnIndex == SEGMENTNAMEINDEX)
         {
             Run[rowIndex].Name = value.ToString();
+            runGrid.InvalidateCell(LASTSUBSPLITICONINDEX, rowIndex);
             RaiseRunEdited();
             return new ParsingResults(true, value);
         }
@@ -831,9 +844,9 @@ public partial class RunEditorDialog : Form
     {
         InvalidateHistoryCache();
 
-        // Remove columns beyond Segment Name (keep Icon=0, SegmentName=1)
-        while (runGrid.Columns.Count > 2)
-            runGrid.Columns.RemoveAt(2);
+        // Remove columns beyond Segment Name (keep both icon columns and Segment Name).
+        while (runGrid.Columns.Count > SEGMENTNAMEINDEX + 1)
+            runGrid.Columns.RemoveAt(SEGMENTNAMEINDEX + 1);
 
         // Add Split Time column
         var splitCol = new DataGridViewTextBoxColumn
@@ -887,9 +900,9 @@ public partial class RunEditorDialog : Form
         SelectedAttemptIndex = null;
         InvalidateHistoryCache();
 
-        // Remove all columns after Icon
-        while (runGrid.Columns.Count > 1)
-            runGrid.Columns.RemoveAt(1);
+        // Remove columns after the two icon columns.
+        while (runGrid.Columns.Count > LASTSUBSPLITICONINDEX + 1)
+            runGrid.Columns.RemoveAt(LASTSUBSPLITICONINDEX + 1);
 
         // Restore normal columns (matching constructor column setup)
         var segNameCol = new DataGridViewTextBoxColumn
@@ -1100,12 +1113,26 @@ public partial class RunEditorDialog : Form
     {
         if (e.RowIndex < Run.Count)
         {
+            if (e.ColumnIndex == LASTSUBSPLITICONINDEX && !IsLastSubsplitIconTarget(e.RowIndex))
+            {
+                e.CellStyle.BackColor = SystemColors.Control;
+                e.CellStyle.ForeColor = SystemColors.GrayText;
+                e.CellStyle.SelectionBackColor = SystemColors.Control;
+                e.CellStyle.SelectionForeColor = SystemColors.GrayText;
+            }
+
             if (SelectedAttemptIndex != null)
             {
                 // History mode formatting
                 if (e.ColumnIndex == ICONINDEX)
                 {
                     e.Value = Run[e.RowIndex].Icon;
+                    return;
+                }
+
+                if (e.ColumnIndex == LASTSUBSPLITICONINDEX)
+                {
+                    e.Value = Run[e.RowIndex].LastSubsplitIcon;
                     return;
                 }
 
@@ -1218,6 +1245,10 @@ public partial class RunEditorDialog : Form
             {
                 e.Value = Run[e.RowIndex].Icon;
             }
+            else if (e.ColumnIndex == LASTSUBSPLITICONINDEX)
+            {
+                e.Value = Run[e.RowIndex].LastSubsplitIcon;
+            }
         }
     }
 
@@ -1238,62 +1269,201 @@ public partial class RunEditorDialog : Form
         e.ThrowException = false;
     }
 
-    private void runGrid_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
+    private void runGrid_MouseClick(object sender, MouseEventArgs e)
     {
-        if (e.ColumnIndex == ICONINDEX && e.RowIndex >= 0 && e.RowIndex < Run.Count)
+        if (e.Button == MouseButtons.Right)
         {
-            var dialog = new OpenFileDialog
-            {
-                Filter = T("Image Files|*.BMP;*.JPG;*.GIF;*.JPEG;*.PNG|All files (*.*)|*.*")
-            };
-            bool multiEdit = runGrid.SelectedCells.Count > 1;
-            dialog.Title = !string.IsNullOrEmpty(Run[e.RowIndex].Name) && !multiEdit
-                ? string.Format(T("Set Icon for {0}..."), Run[e.RowIndex].Name)
-                : T("Set Icon...");
+            DataGridView.HitTestInfo hit = runGrid.HitTest(e.X, e.Y);
+            int rowIndex = hit.RowIndex;
+            if (rowIndex < 0 || rowIndex >= Run.Count)
+                return;
 
-            DialogResult result = dialog.ShowDialog();
-            if (result == DialogResult.OK)
+            if (hit.ColumnIndex == ICONINDEX)
             {
-                ChangeImage(e.RowIndex, dialog.FileName, multiEdit);
+                var iconMenu = new ContextMenu();
+                iconMenu.MenuItems.Add(new MenuItem(T("Set Icon..."), (_, _) => SetIcon(rowIndex)));
+                iconMenu.Show(runGrid, new Point(e.X, e.Y));
+                return;
             }
+
+            if (hit.ColumnIndex != LASTSUBSPLITICONINDEX || !IsLastSubsplitIconTarget(rowIndex))
+                return;
+
+            var menu = new ContextMenu();
+            menu.MenuItems.Add(new MenuItem(T("Set Last Subsplit Icon..."), (_, _) => SetLastSubsplitIcon(rowIndex)));
+            menu.Show(runGrid, new Point(e.X, e.Y));
         }
     }
 
-    private void ChangeImage(int rowIndex, string fileName, bool multiEdit)
+    private void runGrid_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
     {
+        if (e.RowIndex < 0 || e.RowIndex >= Run.Count)
+            return;
+
+        bool isLastSubsplitIcon = e.ColumnIndex == LASTSUBSPLITICONINDEX;
+        if (e.ColumnIndex != ICONINDEX && !isLastSubsplitIcon)
+            return;
+
+        if (isLastSubsplitIcon)
+        {
+            if (!IsLastSubsplitIconTarget(e.RowIndex))
+            {
+                return;
+            }
+
+            if (runGrid.SelectedCells.Count > 1)
+            {
+                ShowLastSubsplitIconMultiEditError();
+                return;
+            }
+        }
+
+        var dialog = new OpenFileDialog
+        {
+            Filter = T("Image Files|*.BMP;*.JPG;*.GIF;*.JPEG;*.PNG|All files (*.*)|*.*")
+        };
+        bool multiEdit = !isLastSubsplitIcon && runGrid.SelectedCells.Count > 1;
+        string segmentName = Run[e.RowIndex].Name;
+        dialog.Title = !string.IsNullOrEmpty(segmentName) && !multiEdit
+            ? string.Format(
+                isLastSubsplitIcon ? T("Set Last Subsplit Icon for {0}...") : T("Set Icon for {0}..."),
+                segmentName)
+            : isLastSubsplitIcon ? T("Set Last Subsplit Icon...") : T("Set Icon...");
+
+        DialogResult result = dialog.ShowDialog();
+        if (result == DialogResult.OK)
+        {
+            ChangeImage(e.RowIndex, dialog.FileName, multiEdit, e.ColumnIndex);
+        }
+    }
+
+    private bool IsLastSubsplitIconTarget(int rowIndex)
+    {
+        return !string.IsNullOrEmpty(Run[rowIndex].Name) && Run[rowIndex].Name.StartsWith("{");
+    }
+
+    private void ShowInvalidLastSubsplitIconTarget(int rowIndex)
+    {
+        string message = string.IsNullOrEmpty(Run[rowIndex].Name)
+            ? "Cannot add a last subsplit icon to a split with an empty name!"
+            : "Cannot add a last subsplit icon to a normal split! Please select a last subsplit!";
+        MessageBox.Show(message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+    }
+
+    private void SetLastSubsplitIcon(int rowIndex)
+    {
+        if (!IsLastSubsplitIconTarget(rowIndex))
+        {
+            ShowInvalidLastSubsplitIconTarget(rowIndex);
+            return;
+        }
+
+        if (runGrid.SelectedCells.Count > 1)
+        {
+            ShowLastSubsplitIconMultiEditError();
+            return;
+        }
+
+        var dialog = new OpenFileDialog
+        {
+            Filter = "Image Files|*.BMP;*.JPG;*.GIF;*.JPEG;*.PNG|All files (*.*)|*.*",
+            Title = "Set Last Subsplit Icon for " + Run[rowIndex].Name + "..."
+        };
+
+        if (dialog.ShowDialog() == DialogResult.OK)
+            ChangeImage(rowIndex, dialog.FileName, false, LASTSUBSPLITICONINDEX);
+    }
+
+    private void SetIcon(int rowIndex)
+    {
+        var dialog = new OpenFileDialog
+        {
+            Filter = T("Image Files|*.BMP;*.JPG;*.GIF;*.JPEG;*.PNG|All files (*.*)|*.*"),
+            Title = !string.IsNullOrEmpty(Run[rowIndex].Name)
+                ? string.Format(T("Set Icon for {0}..."), Run[rowIndex].Name)
+                : T("Set Icon...")
+        };
+
+        if (dialog.ShowDialog() == DialogResult.OK)
+            ChangeImage(rowIndex, dialog.FileName, false, ICONINDEX);
+    }
+
+    private void ChangeImage(int rowIndex, string fileName, bool multiEdit, int columnIndex)
+    {
+        bool isLastSubsplitIcon = columnIndex == LASTSUBSPLITICONINDEX;
+        if (isLastSubsplitIcon && multiEdit)
+        {
+            ShowLastSubsplitIconMultiEditError();
+            return;
+        }
+
+        if (isLastSubsplitIcon && !IsLastSubsplitIconTarget(rowIndex))
+        {
+            ShowInvalidLastSubsplitIconTarget(rowIndex);
+            return;
+        }
+
+        DataGridViewCell[] targetCells = multiEdit
+            ? [.. runGrid.SelectedCells
+                .Cast<DataGridViewCell>()
+                .Where(cell => cell.ColumnIndex == columnIndex)]
+            : [];
+
+        if (multiEdit && targetCells.Length == 0)
+            return;
+
+        if (isLastSubsplitIcon && targetCells.Any(cell => !IsLastSubsplitIconTarget(cell.RowIndex)))
+        {
+            MessageBox.Show("Cannot add a last subsplit icon to a normal split! Please select only last subsplits!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            return;
+        }
+
         try
         {
             var image = Image.FromFile(fileName);
 
             if (!multiEdit)
             {
-                var oldImage = (Image)runGrid.Rows[rowIndex].Cells[ICONINDEX].Value;
+                Image oldImage = isLastSubsplitIcon ? Run[rowIndex].LastSubsplitIcon : Run[rowIndex].Icon;
                 if (oldImage != null)
                 {
                     ImagesToDispose.Add(oldImage);
                 }
 
-                Run[rowIndex].Icon = image;
-                runGrid.NotifyCurrentCellDirty(true);
+                if (isLastSubsplitIcon)
+                {
+                    Run[rowIndex].LastSubsplitIcon = image;
+                }
+                else
+                {
+                    Run[rowIndex].Icon = image;
+                }
+
+                runGrid.UpdateCellValue(columnIndex, rowIndex);
             }
             else
             {
-                foreach (DataGridViewCell cell in runGrid.SelectedCells)
+                foreach (DataGridViewCell cell in targetCells)
                 {
-                    if (cell.ColumnIndex != ICONINDEX)
-                    {
-                        continue;
-                    }
-
-                    var oldImage = (Image)cell.Value;
+                    Image oldImage = isLastSubsplitIcon ? Run[cell.RowIndex].LastSubsplitIcon : Run[cell.RowIndex].Icon;
                     if (oldImage != null)
                     {
                         ImagesToDispose.Add(oldImage);
                     }
 
-                    Run[cell.RowIndex].Icon = (Image)image.Clone();
-                    runGrid.UpdateCellValue(ICONINDEX, cell.RowIndex);
+                    if (isLastSubsplitIcon)
+                    {
+                        Run[cell.RowIndex].LastSubsplitIcon = (Image)image.Clone();
+                    }
+                    else
+                    {
+                        Run[cell.RowIndex].Icon = (Image)image.Clone();
+                    }
+
+                    runGrid.UpdateCellValue(columnIndex, cell.RowIndex);
                 }
+
+                ImagesToDispose.Add(image);
             }
 
             RaiseRunEdited();
@@ -1303,6 +1473,11 @@ public partial class RunEditorDialog : Form
             Log.Error(ex);
             MessageBox.Show(T("Could not load image!"), T("Error"), MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
+    }
+
+    private void ShowLastSubsplitIconMultiEditError()
+    {
+        MessageBox.Show("Cannot add a last subsplit icon when multiple splits are selected! Try selecting only one or no splits!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
     }
 
     private void Fix()
@@ -1618,6 +1793,13 @@ public partial class RunEditorDialog : Form
     {
         if (e.KeyCode == Keys.Delete)
         {
+            if (runGrid.SelectedCells.Count > 1
+                && runGrid.SelectedCells.Cast<DataGridViewCell>().Any(cell => cell.ColumnIndex == LASTSUBSPLITICONINDEX))
+            {
+                ShowLastSubsplitIconMultiEditError();
+                return;
+            }
+
             foreach (DataGridViewCell selectedObject in runGrid.SelectedCells.OfType<DataGridViewCell>().Reverse())
             {
                 DataGridViewCell selectedCell = selectedObject;
@@ -1640,6 +1822,16 @@ public partial class RunEditorDialog : Form
                     }
 
                     Run[selectedCell.RowIndex].Icon = null;
+                    RaiseRunEdited();
+                }
+                else if (selectedCell.ColumnIndex == LASTSUBSPLITICONINDEX)
+                {
+                    if (Run[selectedCell.RowIndex].LastSubsplitIcon != null)
+                    {
+                        ImagesToDispose.Add(Run[selectedCell.RowIndex].LastSubsplitIcon);
+                    }
+
+                    Run[selectedCell.RowIndex].LastSubsplitIcon = null;
                     RaiseRunEdited();
                 }
                 else
@@ -1766,6 +1958,10 @@ public partial class RunEditorDialog : Form
             if (Run[selectedIndex].Icon != null)
             {
                 ImagesToDispose.Add(Run[selectedIndex].Icon);
+            }
+            if (Run[selectedIndex].LastSubsplitIcon != null)
+            {
+                ImagesToDispose.Add(Run[selectedIndex].LastSubsplitIcon);
             }
 
             SegmentList.RemoveAt(selectedIndex);
@@ -2484,7 +2680,7 @@ public partial class RunEditorDialog : Form
             Point dgvPos = runGrid.PointToClient(new Point(e.X, e.Y));
             DataGridView.HitTestInfo info = runGrid.HitTest(dgvPos.X, dgvPos.Y);
             string imagePath = (e.Data.GetData(DataFormats.FileDrop) as string[])?[0];
-            ChangeImage(info.RowIndex, imagePath, false);
+            ChangeImage(info.RowIndex, imagePath, false, info.ColumnIndex);
             runGrid.Refresh();
         }
     }
@@ -2503,6 +2699,9 @@ public partial class RunEditorDialog : Form
         return e.Data.GetDataPresent(DataFormats.FileDrop)
             && info.ColumnIndex != -1
             && runGrid.Columns[info.ColumnIndex] is DataGridViewImageColumn
+            && info.RowIndex >= 0
+            && info.RowIndex < Run.Count
+            && (info.ColumnIndex != LASTSUBSPLITICONINDEX || IsLastSubsplitIconTarget(info.RowIndex))
             && info.Type == DataGridViewHitTestType.Cell;
     }
 

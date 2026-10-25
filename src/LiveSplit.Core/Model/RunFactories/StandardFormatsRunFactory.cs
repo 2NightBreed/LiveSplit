@@ -214,6 +214,7 @@ public class StandardFormatsRunFactory : IRunFactory
             var split = new Segment(segmentNames[i])
             {
                 Icon = ParseImage(segment.IconPtr(), segment.IconLen()),
+                LastSubsplitIcon = ParseImage(segment.LastSubsplitIconPtr(), segment.LastSubsplitIconLen()),
                 BestSegmentTime = ParseTime(segment.BestSegmentTime()),
             };
 

@@ -1417,6 +1417,31 @@ namespace LiveSplitCore
             return result;
         }
         /// <summary>
+        /// Accesses the last subsplit icon's data. If there is no last subsplit icon,
+        /// this returns an empty buffer.
+        /// </summary>
+        public IntPtr LastSubsplitIconPtr()
+        {
+            if (this.ptr == IntPtr.Zero)
+            {
+                throw new ObjectDisposedException("this");
+            }
+            var result = LiveSplitCoreNative.Segment_last_subsplit_icon_ptr(this.ptr);
+            return result;
+        }
+        /// <summary>
+        /// Accesses the amount of bytes the last subsplit icon's data takes up.
+        /// </summary>
+        public ulong LastSubsplitIconLen()
+        {
+            if (this.ptr == IntPtr.Zero)
+            {
+                throw new ObjectDisposedException("this");
+            }
+            var result = (ulong)LiveSplitCoreNative.Segment_last_subsplit_icon_len(this.ptr);
+            return result;
+        }
+        /// <summary>
         /// Accesses the specified comparison's time. If there's none for this
         /// comparison, an empty time is being returned (but not stored in the
         /// segment).
@@ -2222,6 +2247,10 @@ namespace LiveSplitCore
         public static extern IntPtr Segment_icon_ptr(IntPtr self);
         [DllImport("livesplit_core", CallingConvention = CallingConvention.Cdecl)]
         public static extern UIntPtr Segment_icon_len(IntPtr self);
+        [DllImport("livesplit_core", CallingConvention = CallingConvention.Cdecl)]
+        public static extern IntPtr Segment_last_subsplit_icon_ptr(IntPtr self);
+        [DllImport("livesplit_core", CallingConvention = CallingConvention.Cdecl)]
+        public static extern UIntPtr Segment_last_subsplit_icon_len(IntPtr self);
         [DllImport("livesplit_core", CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr Segment_comparison(IntPtr self, LSCoreString comparison);
         [DllImport("livesplit_core", CallingConvention = CallingConvention.Cdecl)]

@@ -2141,6 +2141,19 @@ public partial class TimerForm : Form
         }
     }
 
+    private static string AddCustomSuffixToSavePath(string savePath)
+    {
+        const string customSuffix = " (custom)";
+
+        if (savePath.IndexOf(customSuffix, StringComparison.Ordinal) >= 0)
+        {
+            return savePath;
+        }
+
+        string extension = Path.GetExtension(savePath);
+        return savePath.Insert(savePath.Length - extension.Length, customSuffix);
+    }
+
     private bool SaveSplits(bool promptPBMessage, bool suppressPrompts = false)
     {
         string savePath = CurrentState.Run.FilePath;
@@ -2159,6 +2172,9 @@ public partial class TimerForm : Form
                 return SaveSplitsAs(promptPBMessage);
             }
         }
+
+        savePath = AddCustomSuffixToSavePath(savePath);
+        CurrentState.Run.FilePath = savePath;
 
         CurrentState.Run.FixSplits();
 
@@ -2256,6 +2272,9 @@ public partial class TimerForm : Form
                 return SaveLayoutAs();
             }
         }
+
+        savePath = AddCustomSuffixToSavePath(savePath);
+        Layout.FilePath = savePath;
 
         try
         {

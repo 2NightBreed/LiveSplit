@@ -29,9 +29,8 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(TimerForm));
-            this.RightClickMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.RightClickMenu = new System.Windows.Forms.ContextMenuStrip();
             this.editSplitsMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.openSplitsMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.saveSplitsMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -88,7 +87,7 @@
             this.aboutMenuItem,
             this.exitMenuItem});
             this.RightClickMenu.Name = "RightClickMenu";
-            this.RightClickMenu.Size = new System.Drawing.Size(167, 408);
+            this.RightClickMenu.Size = new System.Drawing.Size(167, 364);
             this.RightClickMenu.Opening += new System.ComponentModel.CancelEventHandler(this.RightClickMenu_Opening);
             // 
             // editSplitsMenuItem
@@ -136,22 +135,28 @@
             this.controlMenuItem.Size = new System.Drawing.Size(166, 22);
             this.controlMenuItem.Text = "Control";
             // 
+            // comparisonMenuItem
+            // 
+            this.comparisonMenuItem.Name = "comparisonMenuItem";
+            this.comparisonMenuItem.Size = new System.Drawing.Size(166, 22);
+            this.comparisonMenuItem.Text = "Compare Against";
+            // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(177, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(163, 6);
             // 
             // shareMenuItem
             // 
             this.shareMenuItem.Name = "shareMenuItem";
-            this.shareMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.shareMenuItem.Size = new System.Drawing.Size(166, 22);
             this.shareMenuItem.Text = "Share...";
             this.shareMenuItem.Click += new System.EventHandler(this.shareMenuItem_Click);
             // 
             // endRaceSection
             // 
             this.endRaceSection.Name = "endRaceSection";
-            this.endRaceSection.Size = new System.Drawing.Size(166, 6);
+            this.endRaceSection.Size = new System.Drawing.Size(163, 6);
             // 
             // editLayoutMenuItem
             // 
@@ -260,27 +265,20 @@
             // 
             // hotkeysMenuItem
             // 
-            this.hotkeysMenuItem.Enabled = true;
             this.hotkeysMenuItem.Name = "hotkeysMenuItem";
             this.hotkeysMenuItem.Size = new System.Drawing.Size(152, 22);
             this.hotkeysMenuItem.Text = "Global Hotkeys";
             this.hotkeysMenuItem.Click += new System.EventHandler(this.hotkeysMenuItem_Click);
             // 
-            // comparisonMenuItem
+            // tcpServerMenuItem
             // 
-            this.comparisonMenuItem.Name = "comparisonMenuItem";
-            this.comparisonMenuItem.Size = new System.Drawing.Size(166, 22);
-            this.comparisonMenuItem.Text = "Compare Against";
-            //
-            // serverMenuItem
-            //
             this.tcpServerMenuItem.Name = "tcpServerMenuItem";
             this.tcpServerMenuItem.Size = new System.Drawing.Size(152, 22);
             this.tcpServerMenuItem.Text = "Start TCP Server";
             this.tcpServerMenuItem.Click += new System.EventHandler(this.TCPServerMenuItem_Click);
-            //
+            // 
             // webSocketMenuItem
-            //
+            // 
             this.webSocketMenuItem.Name = "webSocketMenuItem";
             this.webSocketMenuItem.Size = new System.Drawing.Size(152, 22);
             this.webSocketMenuItem.Text = "Start WebSocket Server";

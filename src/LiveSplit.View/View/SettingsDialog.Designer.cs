@@ -135,7 +135,7 @@ namespace LiveSplit.View
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 29F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(422, 685);
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(422, 691);
             this.tableLayoutPanel1.TabIndex = 0;
             // 
             // btnChooseRaceProvider
@@ -770,7 +770,7 @@ namespace LiveSplit.View
             // btnOK
             // 
             this.btnOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnOK.Location = new System.Drawing.Point(269, 694);
+            this.btnOK.Location = new System.Drawing.Point(269, 700);
             this.btnOK.Name = "btnOK";
             this.btnOK.Size = new System.Drawing.Size(75, 23);
             this.btnOK.TabIndex = 0;
@@ -783,7 +783,7 @@ namespace LiveSplit.View
             this.btnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.btnCancel.Location = new System.Drawing.Point(350, 694);
+            this.btnCancel.Location = new System.Drawing.Point(350, 700);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(75, 23);
             this.btnCancel.TabIndex = 1;
@@ -812,7 +812,7 @@ namespace LiveSplit.View
             this.tableLayoutPanel5.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel5.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 29F));
             this.tableLayoutPanel5.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.tableLayoutPanel5.Size = new System.Drawing.Size(428, 720);
+            this.tableLayoutPanel5.Size = new System.Drawing.Size(428, 726);
             this.tableLayoutPanel5.TabIndex = 1;
             // 
             // panel1
@@ -822,7 +822,7 @@ namespace LiveSplit.View
             this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panel1.Location = new System.Drawing.Point(3, 3);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(422, 685);
+            this.panel1.Size = new System.Drawing.Size(422, 691);
             this.panel1.TabIndex = 1;
             // 
             // SettingsDialog

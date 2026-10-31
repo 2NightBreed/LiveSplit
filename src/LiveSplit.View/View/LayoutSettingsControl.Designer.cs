@@ -29,6 +29,8 @@
         private void InitializeComponent()
         {
             this.tableLayoutPanel5 = new System.Windows.Forms.TableLayoutPanel();
+            this.chkAllowMoving = new System.Windows.Forms.CheckBox();
+            this.chkAllowResizing = new System.Windows.Forms.CheckBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
             this.lblOutlines = new System.Windows.Forms.Label();
@@ -86,8 +88,6 @@
             this.chkBestSegments = new System.Windows.Forms.CheckBox();
             this.chkMousePassThroughWhileRunning = new System.Windows.Forms.CheckBox();
             this.chkAlwaysOnTop = new System.Windows.Forms.CheckBox();
-            this.chkAllowResizing = new System.Windows.Forms.CheckBox();
-            this.chkAllowMoving = new System.Windows.Forms.CheckBox();
             this.tableLayoutPanel5.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
@@ -131,6 +131,33 @@
             this.tableLayoutPanel5.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.tableLayoutPanel5.Size = new System.Drawing.Size(462, 570);
             this.tableLayoutPanel5.TabIndex = 41;
+            // 
+            // chkAllowMoving
+            // 
+            this.chkAllowMoving.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
+            this.chkAllowMoving.AutoSize = true;
+            this.chkAllowMoving.Location = new System.Drawing.Point(237, 544);
+            this.chkAllowMoving.Margin = new System.Windows.Forms.Padding(7, 3, 3, 3);
+            this.chkAllowMoving.Name = "chkAllowMoving";
+            this.chkAllowMoving.Size = new System.Drawing.Size(89, 23);
+            this.chkAllowMoving.TabIndex = 29;
+            this.chkAllowMoving.Text = "Allow Moving";
+            this.chkAllowMoving.UseVisualStyleBackColor = true;
+            // 
+            // chkAllowResizing
+            // 
+            this.chkAllowResizing.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
+            this.chkAllowResizing.AutoSize = true;
+            this.tableLayoutPanel5.SetColumnSpan(this.chkAllowResizing, 2);
+            this.chkAllowResizing.Location = new System.Drawing.Point(7, 544);
+            this.chkAllowResizing.Margin = new System.Windows.Forms.Padding(7, 3, 3, 3);
+            this.chkAllowResizing.Name = "chkAllowResizing";
+            this.chkAllowResizing.Size = new System.Drawing.Size(94, 23);
+            this.chkAllowResizing.TabIndex = 28;
+            this.chkAllowResizing.Text = "Allow Resizing";
+            this.chkAllowResizing.UseVisualStyleBackColor = true;
             // 
             // groupBox2
             // 
@@ -869,33 +896,6 @@
             this.chkAlwaysOnTop.TabIndex = 25;
             this.chkAlwaysOnTop.Text = "Always on Top";
             this.chkAlwaysOnTop.UseVisualStyleBackColor = true;
-            // 
-            // chkAllowResizing
-            // 
-            this.chkAllowResizing.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left)));
-            this.chkAllowResizing.AutoSize = true;
-            this.tableLayoutPanel5.SetColumnSpan(this.chkAllowResizing, 2);
-            this.chkAllowResizing.Location = new System.Drawing.Point(7, 544);
-            this.chkAllowResizing.Margin = new System.Windows.Forms.Padding(7, 3, 3, 3);
-            this.chkAllowResizing.Name = "chkAllowResizing";
-            this.chkAllowResizing.Size = new System.Drawing.Size(94, 23);
-            this.chkAllowResizing.TabIndex = 28;
-            this.chkAllowResizing.Text = "Allow Resizing";
-            this.chkAllowResizing.UseVisualStyleBackColor = true;
-            // 
-            // chkAllowMoving
-            // 
-            this.chkAllowMoving.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left)));
-            this.chkAllowMoving.AutoSize = true;
-            this.chkAllowMoving.Location = new System.Drawing.Point(237, 544);
-            this.chkAllowMoving.Margin = new System.Windows.Forms.Padding(7, 3, 3, 3);
-            this.chkAllowMoving.Name = "chkAllowMoving";
-            this.chkAllowMoving.Size = new System.Drawing.Size(89, 23);
-            this.chkAllowMoving.TabIndex = 29;
-            this.chkAllowMoving.Text = "Allow Moving";
-            this.chkAllowMoving.UseVisualStyleBackColor = true;
             // 
             // LayoutSettingsControl
             // 

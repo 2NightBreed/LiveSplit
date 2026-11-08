@@ -10,7 +10,7 @@ public class AverageSegmentsComparisonGenerator : IComparisonGenerator
 {
     public IRun Run { get; set; }
     public const string ComparisonName = "Average Segments";
-    public const string ShortComparisonName = "Average";
+    public const string ShortComparisonName = "Avg";
     public string Name => ComparisonName;
     public const double Weight = 0.75;
 

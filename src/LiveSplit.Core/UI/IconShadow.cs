@@ -7,7 +7,7 @@ public class IconShadow
 {
     public static readonly float[] Kernel = [0.398942f, 0.241971f, 0.053991f, 0.00443185f];
 
-    public static Bitmap Generate(Image image, Color shadowColor)
+    public static Bitmap Generate(Image image, Color shadowColor, bool applyBlur = true)
     {
         float shadowStrength = 0.8f;
         byte red = shadowColor.R;
@@ -41,37 +41,53 @@ public class IconShadow
             return tempImage.GetPixel(x, y).A / 255.0f;
         }
 
-        //Horizontal Blur
-        for (int x = 0; x < tempImage.Width; ++x)
+        if (applyBlur)
         {
-            for (int y = 0; y < tempImage.Height; ++y)
             {
-                float result = Kernel[0] * get1(x, y);
-
-                for (int i = 1; i < 4; ++i)
+                //Horizontal Blur
+                for (int x = 0; x < tempImage.Width; ++x)
                 {
-                    float weight = Kernel[i];
-                    result += weight * (get1(x - i, y) + get1(x + i, y));
+                    for (int y = 0; y < tempImage.Height; ++y)
+                    {
+                        float result = Kernel[0] * get1(x, y);
+
+                        for (int i = 1; i < 4; ++i)
+                        {
+                            float weight = Kernel[i];
+                            result += weight * (get1(x - i, y) + get1(x + i, y));
+                        }
+
+                        tempImage.SetPixel(x, y, Color.FromArgb((int)((alpha * result) + 0.5f), red, green, blue));
+                    }
                 }
 
-                tempImage.SetPixel(x, y, Color.FromArgb((int)((alpha * result) + 0.5f), red, green, blue));
+                //Vertical Blur
+                for (int x = 0; x < resultImage.Width; ++x)
+                {
+                    for (int y = 0; y < resultImage.Height; ++y)
+                    {
+                        float result = Kernel[0] * get2(x, y);
+
+                        for (int i = 1; i < 4; ++i)
+                        {
+                            float weight = Kernel[i];
+                            result += weight * (get2(x, y - i) + get2(x, y + i));
+                        }
+
+                        resultImage.SetPixel(x, y, Color.FromArgb((int)((shadowStrength * alpha * result) + 0.5f), red, green, blue));
+                    }
+                }
             }
         }
-
-        //Vertical Blur
-        for (int x = 0; x < resultImage.Width; ++x)
+        else
         {
-            for (int y = 0; y < resultImage.Height; ++y)
+            for (int x = 0; x < resultImage.Width; ++x)
             {
-                float result = Kernel[0] * get2(x, y);
-
-                for (int i = 1; i < 4; ++i)
+                for (int y = 0; y < resultImage.Height; ++y)
                 {
-                    float weight = Kernel[i];
-                    result += weight * (get2(x, y - i) + get2(x, y + i));
+                    float result = get1(x, y);
+                    resultImage.SetPixel(x, y, Color.FromArgb((int)((shadowStrength * alpha * result) + 0.5f), red, green, blue));
                 }
-
-                resultImage.SetPixel(x, y, Color.FromArgb((int)((shadowStrength * alpha * result) + 0.5f), red, green, blue));
             }
         }
 

@@ -821,7 +821,7 @@
             this.btnBackground2.Size = new System.Drawing.Size(23, 23);
             this.btnBackground2.TabIndex = 1;
             this.btnBackground2.UseVisualStyleBackColor = false;
-            this.btnBackground2.Click += new System.EventHandler(this.BackgroundColorButtonClick);
+            this.btnBackground2.MouseUp += new System.Windows.Forms.MouseEventHandler(this.BackgroundColorButtonMouseUp);
             // 
             // btnBackground
             // 

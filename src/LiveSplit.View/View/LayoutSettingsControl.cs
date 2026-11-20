@@ -106,8 +106,22 @@ public partial class LayoutSettingsControl : UserControl
         SettingsHelper.ColorButtonClick((Button)sender, this);
     }
 
-    private void BackgroundColorButtonClick(object sender, EventArgs e)
+    private void BackgroundColorButtonMouseUp(object sender, MouseEventArgs e)
     {
+        if (e.Button == MouseButtons.Right && cmbBackgroundType.SelectedItem.ToString() == "Image" && Settings.BackgroundImage != null)
+        {
+            var menu = new ContextMenu();
+            menu.MenuItems.Add(new MenuItem(T("Clear Image"), (_, _) => {
+                if (Settings.BackgroundImage != originalBackgroundImage)
+                {
+                    Settings.BackgroundImage.Dispose();
+                }
+                Settings.BackgroundImage = ((Button)sender).BackgroundImage = null;
+            }));
+            menu.Show((Control)sender, new Point(e.X, e.Y));
+            return;
+        }
+
         if (cmbBackgroundType.SelectedItem.ToString() == "Image")
         {
             var dialog = new OpenFileDialog

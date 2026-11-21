@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 
 namespace LiveSplit.Options;
@@ -26,6 +27,8 @@ public class LayoutSettings : ICloneable
     public bool TransparentBlurBackground { get; set; }
 
     public Image BackgroundImage { get; set; }
+    public List<Image> BackgroundImages { get; set; }
+    public int SlideshowTiming { get; set; }
     public float ImageOpacity { get; set; }
     public float ImageBlur { get; set; }
 
@@ -82,6 +85,8 @@ public class LayoutSettings : ICloneable
         TransparentBackground = settings.TransparentBackground;
         TransparentBlurBackground = settings.TransparentBlurBackground;
         BackgroundImage = settings.BackgroundImage;
+        BackgroundImages = settings.BackgroundImages;
+        SlideshowTiming = settings.SlideshowTiming;
         ImageOpacity = settings.ImageOpacity;
         ImageBlur = settings.ImageBlur;
         AllowResizing = settings.AllowResizing;

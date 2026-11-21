@@ -48,7 +48,8 @@ public class XMLLayoutFactory : ILayoutFactory
             ImageOpacity = SettingsHelper.ParseFloat(element["ImageOpacity"], 1f),
             ImageBlur = SettingsHelper.ParseFloat(element["ImageBlur"], 0f),
             TransparentBackground = SettingsHelper.ParseBool(element["TransparentBackground"], false),
-            TransparentBlurBackground = SettingsHelper.ParseBool(element["TransparentBlurBackground"], false)
+            TransparentBlurBackground = SettingsHelper.ParseBool(element["TransparentBlurBackground"], false),
+            SlideshowTiming = SettingsHelper.ParseInt(element["SlideshowTiming"], 5)
         };
 
         if (version >= new Version(1, 3))
@@ -89,6 +90,7 @@ public class XMLLayoutFactory : ILayoutFactory
         }
 
         settings.BackgroundImage = SettingsHelper.GetImageFromElement(element["BackgroundImage"]);
+        settings.BackgroundImages = SettingsHelper.GetImagesFromElement(element["BackgroundImages"]) ?? [];
 
         return settings;
     }

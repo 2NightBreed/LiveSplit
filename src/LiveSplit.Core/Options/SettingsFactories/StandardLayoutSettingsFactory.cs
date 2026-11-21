@@ -37,6 +37,8 @@ public class StandardLayoutSettingsFactory : ILayoutSettingsFactory
             TransparentBackground = false,
             TransparentBlurBackground = false,
             BackgroundImage = null,
+            BackgroundImages = [],
+            SlideshowTiming = 5,
             ImageOpacity = 1f,
             ImageBlur = 0f,
             Opacity = 1,

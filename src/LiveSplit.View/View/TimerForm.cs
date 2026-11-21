@@ -63,6 +63,8 @@ public partial class TimerForm : Form
     private Image previousBackground { get; set; }
     private float previousOpacity { get; set; }
     private float previousBlur { get; set; }
+    private int slideshowImageIndex;
+    private readonly System.Windows.Forms.Timer slideshowTimer;
     private Image blurredBackground { get; set; }
     private Image bakedBackground { get; set; }
     private bool TransparentBackground
@@ -260,6 +262,8 @@ public partial class TimerForm : Form
     {
         BasePath = basePath;
         InitializeComponent();
+        slideshowTimer = new System.Windows.Forms.Timer(components);
+        slideshowTimer.Tick += SlideshowTimer_Tick;
         Init(splitsPath, layoutPath);
     }
 
@@ -862,7 +866,7 @@ public partial class TimerForm : Form
 
     private void TimerForm_SizeChanged(object sender, EventArgs e)
     {
-        CreateBakedBackground();
+        CreateBakedBackground(GetBackgroundImage());
         if (RefreshesRemaining <= 0)
         {
             if (Layout.Mode == LayoutMode.Vertical)
@@ -1673,15 +1677,18 @@ public partial class TimerForm : Form
 
     private void DrawBackground(Graphics g)
     {
-        if (Layout.Settings.BackgroundType == BackgroundType.Image)
+        UpdateSlideshowTimer();
+
+        if (Layout.Settings.BackgroundType is BackgroundType.Image or BackgroundType.Slideshow)
         {
-            if (Layout.Settings.BackgroundImage != null)
+            Image backgroundImage = GetBackgroundImage();
+            if (backgroundImage != null)
             {
-                if (Layout.Settings.BackgroundImage != previousBackground
+                if (backgroundImage != previousBackground
                     || Layout.Settings.ImageOpacity != previousOpacity
                     || Layout.Settings.ImageBlur != previousBlur)
                 {
-                    CreateBakedBackground();
+                    CreateBakedBackground(backgroundImage);
                 }
 
                 foreach (RectangleF rectangle in UpdateRegion.GetRegionScans(g.Transform))
@@ -1718,9 +1725,78 @@ public partial class TimerForm : Form
         }
     }
 
-    private void CreateBakedBackground()
+    private void UpdateSlideshowTimer()
     {
-        Image image = Layout.Settings.BackgroundImage;
+        var settings = Layout.Settings;
+        var images = settings.BackgroundImages;
+        if (settings.BackgroundType != BackgroundType.Slideshow || images == null || images.Count == 0)
+        {
+            slideshowImageIndex = 0;
+            slideshowTimer.Stop();
+            return;
+        }
+
+        if (slideshowImageIndex < 0 || slideshowImageIndex >= images.Count)
+        {
+            slideshowImageIndex = 0;
+        }
+
+        if (images.Count < 2 || settings.SlideshowTiming <= 0)
+        {
+            slideshowTimer.Stop();
+            return;
+        }
+
+        int interval = Math.Min(settings.SlideshowTiming, 900) * 1000;
+        if (slideshowTimer.Interval != interval)
+        {
+            slideshowTimer.Stop();
+            slideshowTimer.Interval = interval;
+        }
+
+        if (!slideshowTimer.Enabled)
+        {
+            slideshowTimer.Start();
+        }
+    }
+
+    private void SlideshowTimer_Tick(object sender, EventArgs e)
+    {
+        var settings = Layout.Settings;
+        var images = settings.BackgroundImages;
+        if (settings.BackgroundType != BackgroundType.Slideshow || images == null || images.Count < 2)
+        {
+            slideshowImageIndex = 0;
+            slideshowTimer.Stop();
+            return;
+        }
+
+        slideshowImageIndex = (slideshowImageIndex + 1) % images.Count;
+        Invalidate();
+    }
+
+    private Image GetBackgroundImage()
+    {
+        var settings = Layout.Settings;
+        return settings.BackgroundType switch
+        {
+            BackgroundType.Image => settings.BackgroundImage,
+            BackgroundType.Slideshow when settings.BackgroundImages != null && settings.BackgroundImages.Count > 0
+                => slideshowImageIndex >= 0 && slideshowImageIndex < settings.BackgroundImages.Count
+                    ? settings.BackgroundImages[slideshowImageIndex]
+                    : settings.BackgroundImages[0],
+            _ => null
+        };
+    }
+
+    private void CreateBakedBackground(Image backgroundImage)
+    {
+        if (backgroundImage == null)
+        {
+            return;
+        }
+
+        Image image = backgroundImage;
         float opacity = Layout.Settings.ImageOpacity;
         float blur = Layout.Settings.ImageBlur;
 
@@ -1780,7 +1856,7 @@ public partial class TimerForm : Form
             bakedBackground?.Dispose();
 
             bakedBackground = bitmap;
-            previousBackground = Layout.Settings.BackgroundImage;
+            previousBackground = backgroundImage;
             previousOpacity = opacity;
             previousBlur = blur;
         }
@@ -2770,6 +2846,7 @@ public partial class TimerForm : Form
         Layout = layout;
         ComponentRenderer.VisibleComponents = Layout.Components;
         CurrentState.LayoutSettings = layout.Settings;
+        UpdateSlideshowTimer();
         UpdateRefreshesRemaining();
         MinimumSize = new Size(0, 0);
         if (Layout.Mode == LayoutMode.Vertical)

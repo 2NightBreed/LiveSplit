@@ -2,6 +2,7 @@
 using LiveSplit.Options;
 using LiveSplit.UI;
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 
@@ -20,6 +21,7 @@ public partial class LayoutSettingsControl : UserControl
     public new ILayout Layout { get; set; }
 
     private Image originalBackgroundImage { get; set; }
+    private List<Image> originalBackgroundImages { get; set; }
 
     public string TimerFont => SettingsHelper.FormatFont(Settings.TimerFont);
     public string MainFont => SettingsHelper.FormatFont(Settings.TimesFont);
@@ -28,6 +30,11 @@ public partial class LayoutSettingsControl : UserControl
     public float Opacity { get => Settings.Opacity * 100f; set => Settings.Opacity = value / 100f; }
     public float ImageOpacity { get => Settings.ImageOpacity * 100f; set => Settings.ImageOpacity = value / 100f; }
     public float ImageBlur { get => Settings.ImageBlur * 100f; set => Settings.ImageBlur = value / 100f; }
+    public int SlideshowTimingSeconds
+    {
+        get => Math.Min((int)nmcSlideshowTiming.Maximum, Math.Max(1, Settings.SlideshowTiming));
+        set => Settings.SlideshowTiming = Math.Min((int)nmcSlideshowTiming.Maximum, Math.Max(1, value));
+    }
 
     public LayoutSettingsControl(Options.LayoutSettings settings, ILayout layout)
     {
@@ -65,9 +72,11 @@ public partial class LayoutSettingsControl : UserControl
         chkAllowMoving.DataBindings.Add("Checked", Settings, "AllowMoving", false, DataSourceUpdateMode.OnPropertyChanged);
         trkImageOpacity.DataBindings.Add("Value", this, "ImageOpacity", false, DataSourceUpdateMode.OnPropertyChanged);
         trkBlur.DataBindings.Add("Value", this, "ImageBlur", false, DataSourceUpdateMode.OnPropertyChanged);
+        nmcSlideshowTiming.DataBindings.Add("Value", this, "SlideshowTimingSeconds", false, DataSourceUpdateMode.OnPropertyChanged);
 
         cmbBackgroundType.SelectedItem = GetBackgroundTypeString(Settings.BackgroundType);
         originalBackgroundImage = Settings.BackgroundImage;
+        originalBackgroundImages = Settings.BackgroundImages;
 
         chkTransparentBackground.CheckedChanged += chkTransparentBackground_CheckedChanged;
         chkTransparentBlurBackground.CheckedChanged += chkTransparentBlurBackground_CheckedChanged;
@@ -81,6 +90,7 @@ public partial class LayoutSettingsControl : UserControl
             BackgroundType.VerticalGradient => "Vertical Gradient",
             BackgroundType.Blur => "Blur",
             BackgroundType.Image => "Image",
+            BackgroundType.Slideshow => "Slideshow",
             _ => "Solid Color",
         };
     }
@@ -88,16 +98,21 @@ public partial class LayoutSettingsControl : UserControl
     private void cmbGradientType_SelectedIndexChanged(object sender, EventArgs e)
     {
         string selectedItem = cmbBackgroundType.SelectedItem.ToString();
-        btnBackground.Visible = selectedItem is not "Solid Color" and not "Blur" and not "Image";
+        btnBackground.Visible = selectedItem is not "Solid Color" and not "Blur" and not "Image" and not "Slideshow";
         btnBackground2.Visible = selectedItem != "Blur";
         btnBackground2.DataBindings.Clear();
-        lblImageOpacity.Enabled = lblBlur.Enabled = trkImageOpacity.Enabled = trkBlur.Enabled = selectedItem == "Image";
+        lblImageOpacity.Enabled = lblBlur.Enabled = trkImageOpacity.Enabled = trkBlur.Enabled = selectedItem is "Image" or "Slideshow";
+        lblSlideshowTiming.Enabled = nmcSlideshowTiming.Enabled = selectedItem == "Slideshow";
         UpdateTransparencyOptionsEnabled();
-        if (selectedItem == "Image")
+        if (selectedItem is "Image" or "Slideshow")
         {
-            btnBackground2.BackgroundImage = Settings.BackgroundImage;
+            Image backgroundImage = selectedItem == "Image"
+                ? Settings.BackgroundImage
+                : Settings.BackgroundImages.Count > 0 ? Settings.BackgroundImages[0] : null;
+
+            btnBackground2.BackgroundImage = backgroundImage;
             btnBackground2.BackColor = Color.Transparent;
-            lblBackground.Text = T("Image:");
+            lblBackground.Text = T((selectedItem == "Image" ? "Image" : "Image(s)") + ":");
         }
         else
         {
@@ -154,6 +169,47 @@ public partial class LayoutSettingsControl : UserControl
                 {
                     Log.Error(ex);
                     MessageBox.Show(T("Could not load image!"), T("Error"), MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+        }
+        else if (cmbBackgroundType.SelectedItem.ToString() == "Slideshow")
+        {
+            var dialog = new OpenFileDialog
+            {
+                Multiselect = true,
+                Filter = T("Image Files|*.BMP;*.JPG;*.GIF;*.JPEG;*.PNG|All files (*.*)|*.*"),
+                Title = T("Set Background Image(s)...")
+            };
+            DialogResult result = dialog.ShowDialog();
+            if (result == DialogResult.OK)
+            {
+                try
+                {
+                    if (Settings.BackgroundImages != null && Settings.BackgroundImages != originalBackgroundImages)
+                    {
+                        foreach (var backgroundImage in Settings.BackgroundImages)
+                        {
+                            if (backgroundImage != null
+                                && (originalBackgroundImages == null || !originalBackgroundImages.Contains(backgroundImage)))
+                            {
+                                backgroundImage.Dispose();
+                            }
+                        }
+                    }
+
+                    Settings.BackgroundImages ??= [];
+                    foreach (var fileName in dialog.FileNames)
+                    {
+                        var image = Image.FromFile(fileName);
+                        Settings.BackgroundImages.Add(image);
+                    }
+
+                    ((Button)sender).BackgroundImage = Settings.BackgroundImages.Count > 0 ? Settings.BackgroundImages[0] : null;
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(ex);
+                    MessageBox.Show(T("Could not load image(s)!"), T("Error"), MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
         }

@@ -29,6 +29,7 @@ public class LayoutSettings : ICloneable
     public Image BackgroundImage { get; set; }
     public List<Image> BackgroundImages { get; set; }
     public int SlideshowTiming { get; set; }
+    public bool GrayscaleImage { get; set; }
     public float ImageOpacity { get; set; }
     public float ImageBlur { get; set; }
 
@@ -87,6 +88,7 @@ public class LayoutSettings : ICloneable
         BackgroundImage = settings.BackgroundImage;
         BackgroundImages = settings.BackgroundImages;
         SlideshowTiming = settings.SlideshowTiming;
+        GrayscaleImage = settings.GrayscaleImage;
         ImageOpacity = settings.ImageOpacity;
         ImageBlur = settings.ImageBlur;
         AllowResizing = settings.AllowResizing;

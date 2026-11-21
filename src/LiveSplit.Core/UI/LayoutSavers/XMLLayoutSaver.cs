@@ -40,6 +40,7 @@ public class XMLLayoutSaver : ILayoutSaver
         SettingsHelper.CreateSetting(document, element, "BackgroundImage", settings.BackgroundImage) ^
         SettingsHelper.CreateSetting(document, element, "BackgroundImages", settings.BackgroundImages) ^
         SettingsHelper.CreateSetting(document, element, "SlideshowTiming", settings.SlideshowTiming) ^
+        SettingsHelper.CreateSetting(document, element, "GrayscaleImage", settings.GrayscaleImage) ^
         SettingsHelper.CreateSetting(document, element, "ImageOpacity", settings.ImageOpacity) ^
         SettingsHelper.CreateSetting(document, element, "ImageBlur", settings.ImageBlur) ^
         SettingsHelper.CreateSetting(document, element, "Opacity", settings.Opacity) ^

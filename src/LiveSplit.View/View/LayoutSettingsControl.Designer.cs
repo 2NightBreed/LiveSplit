@@ -89,6 +89,7 @@
             this.chkTransparentBlurBackground = new System.Windows.Forms.CheckBox();
             this.lblSlideshowTiming = new System.Windows.Forms.Label();
             this.nmcSlideshowTiming = new System.Windows.Forms.NumericUpDown();
+            this.chkGrayscaleImage = new System.Windows.Forms.CheckBox();
             this.chkBestSegments = new System.Windows.Forms.CheckBox();
             this.chkMousePassThroughWhileRunning = new System.Windows.Forms.CheckBox();
             this.chkAlwaysOnTop = new System.Windows.Forms.CheckBox();
@@ -757,6 +758,7 @@
             this.tableLayoutPanel3.Controls.Add(this.chkTransparentBlurBackground, 4, 1);
             this.tableLayoutPanel3.Controls.Add(this.lblSlideshowTiming, 0, 3);
             this.tableLayoutPanel3.Controls.Add(this.nmcSlideshowTiming, 2, 3);
+            this.tableLayoutPanel3.Controls.Add(this.chkGrayscaleImage, 4, 3);
             this.tableLayoutPanel3.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel3.Location = new System.Drawing.Point(3, 16);
             this.tableLayoutPanel3.Name = "tableLayoutPanel3";
@@ -929,6 +931,19 @@
             0,
             0});
             // 
+            // chkGrayscaleImage
+            // 
+            this.chkGrayscaleImage.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this.chkGrayscaleImage.AutoSize = true;
+            this.tableLayoutPanel3.SetColumnSpan(this.chkGrayscaleImage, 2);
+            this.chkGrayscaleImage.Location = new System.Drawing.Point(231, 93);
+            this.chkGrayscaleImage.Margin = new System.Windows.Forms.Padding(7, 3, 3, 3);
+            this.chkGrayscaleImage.Name = "chkGrayscaleImage";
+            this.chkGrayscaleImage.Size = new System.Drawing.Size(216, 17);
+            this.chkGrayscaleImage.TabIndex = 25;
+            this.chkGrayscaleImage.Text = "Grayscale Image";
+            this.chkGrayscaleImage.UseVisualStyleBackColor = true;
+            // 
             // chkBestSegments
             // 
             this.chkBestSegments.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -1064,5 +1079,6 @@
         private System.Windows.Forms.CheckBox chkTransparentBlurBackground;
         private System.Windows.Forms.Label lblSlideshowTiming;
         private System.Windows.Forms.NumericUpDown nmcSlideshowTiming;
+        private System.Windows.Forms.CheckBox chkGrayscaleImage;
     }
 }

@@ -63,6 +63,7 @@ public partial class TimerForm : Form
     private Image previousBackground { get; set; }
     private float previousOpacity { get; set; }
     private float previousBlur { get; set; }
+    private bool previousGrayscale { get; set; }
     private int slideshowImageIndex;
     private readonly System.Windows.Forms.Timer slideshowTimer;
     private Image blurredBackground { get; set; }
@@ -1686,7 +1687,8 @@ public partial class TimerForm : Form
             {
                 if (backgroundImage != previousBackground
                     || Layout.Settings.ImageOpacity != previousOpacity
-                    || Layout.Settings.ImageBlur != previousBlur)
+                    || Layout.Settings.ImageBlur != previousBlur
+                    || Layout.Settings.GrayscaleImage != previousGrayscale)
                 {
                     CreateBakedBackground(backgroundImage);
                 }
@@ -1796,7 +1798,8 @@ public partial class TimerForm : Form
             return;
         }
 
-        Image image = backgroundImage;
+        bool grayscale = Layout.Settings.GrayscaleImage;
+        Image image = grayscale ? LiveSplitStateHelper.ConvertImageToGrayscale(backgroundImage) : backgroundImage;
         float opacity = Layout.Settings.ImageOpacity;
         float blur = Layout.Settings.ImageBlur;
 
@@ -1809,7 +1812,7 @@ public partial class TimerForm : Form
         {
             if (blur > 0)
             {
-                if (blur != previousBlur || image != previousBackground)
+                if (blur != previousBlur || image != previousBackground || grayscale != previousGrayscale)
                 {
                     blurredBackground?.Dispose();
 
@@ -1859,6 +1862,7 @@ public partial class TimerForm : Form
             previousBackground = backgroundImage;
             previousOpacity = opacity;
             previousBlur = blur;
+            previousGrayscale = grayscale;
         }
     }
 

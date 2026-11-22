@@ -65,6 +65,42 @@ public partial class TimerForm : Form
     private float previousBlur { get; set; }
     private Image blurredBackground { get; set; }
     private Image bakedBackground { get; set; }
+    private bool TransparentBackground
+    {
+        set
+        {
+            if (TransparentBackgroundState != value)
+            {
+                TransparentBackgroundState = value;
+                var attributeData = new WindowCompositionAttributeData()
+                {
+                    Attribute = WCA_ACCENT_POLICY,
+                    Data = value ? AccentPolicyAcrylicBlurPtr : AccentPolicyDisabledPtr,
+                    SizeOfData = Marshal.SizeOf(typeof(AccentPolicy))
+                };
+                SetWindowCompositionAttribute(Handle, attributeData);
+            }
+        }
+    }
+    private bool TransparentBackgroundState = false;
+    private bool TransparentBlurBackground
+    {
+        set
+        {
+            if (TransparentBlurBackgroundState != value)
+            {
+                TransparentBlurBackgroundState = value;
+                var attributeData = new WindowCompositionAttributeData()
+                {
+                    Attribute = WCA_ACCENT_POLICY,
+                    Data = value ? AccentPolicyBlurPtr : AccentPolicyDisabledPtr,
+                    SizeOfData = Marshal.SizeOf(typeof(AccentPolicy))
+                };
+                SetWindowCompositionAttribute(Handle, attributeData);
+            }
+        }
+    }
+    private bool TransparentBlurBackgroundState = false;
 
     public CommandServer Server { get; set; }
 
@@ -178,6 +214,47 @@ public partial class TimerForm : Form
 
     [DllImport("user32.dll")]
     private static extern IntPtr GetForegroundWindow();
+    private const int ACCENT_DISABLED = 0;
+    private const int ACCENT_ENABLE_BLURBEHIND = 3;
+    private const int ACCENT_ENABLE_ACRYLICBLURBEHIND = 6;
+    private const int WCA_ACCENT_POLICY = 19;
+
+    [StructLayout(LayoutKind.Sequential)]
+    internal struct AccentPolicy
+    {
+        public int AccentState;
+        public uint AccentFlags;
+        public uint GradientColor;
+        public uint AnimationId;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    internal struct WindowCompositionAttributeData
+    {
+        public int Attribute;
+        public IntPtr Data;
+        public int SizeOfData;
+    }
+
+    private AccentPolicy AccentPolicyBlur = new()
+    {
+        AccentState = ACCENT_ENABLE_BLURBEHIND,
+    };
+    private AccentPolicy AccentPolicyAcrylicBlur = new()
+    {
+        AccentState = ACCENT_ENABLE_ACRYLICBLURBEHIND,
+    };
+    private static readonly IntPtr AccentPolicyBlurPtr = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(AccentPolicy)));
+    private static readonly IntPtr AccentPolicyAcrylicBlurPtr = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(AccentPolicy)));
+
+    private AccentPolicy AccentPolicyDisabled = new()
+    {
+        AccentState = ACCENT_DISABLED,
+    };
+    private static readonly IntPtr AccentPolicyDisabledPtr = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(AccentPolicy)));
+
+    [DllImport("user32.dll")]
+    private static extern int SetWindowCompositionAttribute(IntPtr hWnd, in WindowCompositionAttributeData data);
 
     public TimerForm(string splitsPath = null, string layoutPath = null, string basePath = "")
     {
@@ -331,6 +408,10 @@ public partial class TimerForm : Form
 
         TopMost = Layout.Settings.AlwaysOnTop;
         BackColor = Color.Black;
+
+        Marshal.StructureToPtr(AccentPolicyBlur, AccentPolicyBlurPtr, false);
+        Marshal.StructureToPtr(AccentPolicyAcrylicBlur, AccentPolicyAcrylicBlurPtr, false);
+        Marshal.StructureToPtr(AccentPolicyDisabled, AccentPolicyDisabledPtr, false);
 
         Server = new CommandServer(CurrentState,
             RefreshHotkeyHooks,
@@ -1532,6 +1613,8 @@ public partial class TimerForm : Form
         DrawBackground(g);
 
         Opacity = Layout.Settings.Opacity;
+        TransparentBackground = Layout.Settings.TransparentBackground;
+        TransparentBlurBackground = Layout.Settings.TransparentBlurBackground;
 
         // Set MousePassThrough after setting Opacity, because setting Opacity can reset the Form's WS_EX_LAYERED flag.
         MousePassThrough = Layout.Settings.MousePassThroughWhileRunning && Model.CurrentState.CurrentPhase == TimerPhase.Running && !IsForegroundWindow;
@@ -1607,10 +1690,24 @@ public partial class TimerForm : Form
                     g.DrawImage(bakedBackground, rect, rect, GraphicsUnit.Pixel);
                 }
             }
+            else
+            {
+                CompositingMode compositingMode = g.CompositingMode;
+                try
+                {
+                    g.CompositingMode = CompositingMode.SourceCopy;
+                    using var brush = new SolidBrush(Layout.Settings.BackgroundColor);
+                    g.FillRectangle(brush, 0, 0, Size.Width, Size.Height);
+                }
+                finally
+                {
+                    g.CompositingMode = compositingMode;
+                }
+            }
         }
-        else if (Layout.Settings.BackgroundColor != Color.Transparent
+        else if ((Layout.Settings.BackgroundColor != Color.Transparent
             || (Layout.Settings.BackgroundType != BackgroundType.SolidColor
-            && Layout.Settings.BackgroundColor2 != Color.Transparent))
+            && Layout.Settings.BackgroundColor2 != Color.Transparent)) && Layout.Settings.BackgroundType != BackgroundType.Blur)
         {
             var gradientBrush = new LinearGradientBrush(
                 new PointF(0, 0),
@@ -1626,6 +1723,11 @@ public partial class TimerForm : Form
         Image image = Layout.Settings.BackgroundImage;
         float opacity = Layout.Settings.ImageOpacity;
         float blur = Layout.Settings.ImageBlur;
+
+        if (Layout.Settings.TransparentBackground || Layout.Settings.TransparentBlurBackground)
+        {
+            image = new Bitmap(image);
+        }
 
         if (image != null)
         {

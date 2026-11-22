@@ -39,6 +39,8 @@ public partial class LayoutSettingsControl : UserControl
         chkAntiAliasing.DataBindings.Add("Checked", Settings, "AntiAliasing", false, DataSourceUpdateMode.OnPropertyChanged);
         chkDropShadows.DataBindings.Add("Checked", Settings, "DropShadows", false, DataSourceUpdateMode.OnPropertyChanged);
         chkRainbow.DataBindings.Add("Checked", Settings, "UseRainbowColor", false, DataSourceUpdateMode.OnPropertyChanged);
+        chkTransparentBackground.DataBindings.Add("Checked", Settings, "TransparentBackground", false, DataSourceUpdateMode.OnPropertyChanged);
+        chkTransparentBlurBackground.DataBindings.Add("Checked", Settings, "TransparentBlurBackground", false, DataSourceUpdateMode.OnPropertyChanged);
         btnTextColor.DataBindings.Add("BackColor", Settings, "TextColor", false, DataSourceUpdateMode.OnPropertyChanged);
         btnBackground.DataBindings.Add("BackColor", Settings, "BackgroundColor", false, DataSourceUpdateMode.OnPropertyChanged);
         btnBackground2.DataBindings.Add("BackColor", Settings, "BackgroundColor2", false, DataSourceUpdateMode.OnPropertyChanged);
@@ -66,6 +68,9 @@ public partial class LayoutSettingsControl : UserControl
 
         cmbBackgroundType.SelectedItem = GetBackgroundTypeString(Settings.BackgroundType);
         originalBackgroundImage = Settings.BackgroundImage;
+
+        chkTransparentBackground.CheckedChanged += chkTransparentBackground_CheckedChanged;
+        chkTransparentBlurBackground.CheckedChanged += chkTransparentBlurBackground_CheckedChanged;
     }
 
     private string GetBackgroundTypeString(BackgroundType type)
@@ -74,6 +79,7 @@ public partial class LayoutSettingsControl : UserControl
         {
             BackgroundType.HorizontalGradient => "Horizontal Gradient",
             BackgroundType.VerticalGradient => "Vertical Gradient",
+            BackgroundType.Blur => "Blur",
             BackgroundType.Image => "Image",
             _ => "Solid Color",
         };
@@ -82,9 +88,11 @@ public partial class LayoutSettingsControl : UserControl
     private void cmbGradientType_SelectedIndexChanged(object sender, EventArgs e)
     {
         string selectedItem = cmbBackgroundType.SelectedItem.ToString();
-        btnBackground.Visible = selectedItem is not "Solid Color" and not "Image";
+        btnBackground.Visible = selectedItem is not "Solid Color" and not "Blur" and not "Image";
+        btnBackground2.Visible = selectedItem != "Blur";
         btnBackground2.DataBindings.Clear();
         lblImageOpacity.Enabled = lblBlur.Enabled = trkImageOpacity.Enabled = trkBlur.Enabled = selectedItem == "Image";
+        UpdateTransparencyOptionsEnabled();
         if (selectedItem == "Image")
         {
             btnBackground2.BackgroundImage = Settings.BackgroundImage;
@@ -95,7 +103,7 @@ public partial class LayoutSettingsControl : UserControl
         {
             btnBackground2.BackgroundImage = null;
             btnBackground2.DataBindings.Add("BackColor", Settings, btnBackground.Visible ? "BackgroundColor2" : "BackgroundColor", false, DataSourceUpdateMode.OnPropertyChanged);
-            lblBackground.Text = T("Color:");
+            lblBackground.Text = T((selectedItem == "Blur" ? selectedItem : "Color") + ":");
         }
 
         Settings.BackgroundType = (BackgroundType)Enum.Parse(typeof(BackgroundType), selectedItem.Replace(" ", ""));
@@ -201,5 +209,24 @@ public partial class LayoutSettingsControl : UserControl
     {
         chkRainbow_CheckedChanged(null, null);
         chkAntiAliasing_CheckedChanged(null, null);
+        chkTransparentBackground_CheckedChanged(null, null);
+        chkTransparentBlurBackground_CheckedChanged(null, null);
+    }
+
+    private void chkTransparentBackground_CheckedChanged(object sender, EventArgs e)
+    {
+        UpdateTransparencyOptionsEnabled();
+    }
+
+    private void chkTransparentBlurBackground_CheckedChanged(object sender, EventArgs e)
+    {
+        UpdateTransparencyOptionsEnabled();
+    }
+
+    private void UpdateTransparencyOptionsEnabled()
+    {
+        bool supportsTransparency = cmbBackgroundType.SelectedItem is "Horizontal Gradient" or "Vertical Gradient" or "Blur";
+        chkTransparentBackground.Enabled = supportsTransparency && !chkTransparentBlurBackground.Checked;
+        chkTransparentBlurBackground.Enabled = supportsTransparency && !chkTransparentBackground.Checked;
     }
 }

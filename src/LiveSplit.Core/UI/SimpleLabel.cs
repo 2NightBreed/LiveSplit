@@ -12,7 +12,20 @@ namespace LiveSplit.UI;
 
 public class SimpleLabel
 {
+    public sealed class TextSegment
+    {
+        public string Text { get; }
+        public Color Color { get; }
+
+        public TextSegment(string text, Color color)
+        {
+            Text = text ?? "";
+            Color = color;
+        }
+    }
+
     public string Text { get; set; }
+    public ICollection<TextSegment> TextSegments { get; set; }
     public ICollection<string> AlternateText { get; set; }
     public float X { get; set; }
     public float Y { get; set; }
@@ -29,6 +42,7 @@ public class SimpleLabel
     public bool IsMonospaced { get; set; }
 
     private StringFormat Format { get; set; }
+    private readonly Dictionary<Color, SolidBrush> SegmentBrushes = new();
 
     public float ActualWidth { get; set; }
 
@@ -126,7 +140,8 @@ public class SimpleLabel
                     ? measurement
                     : MeasureCharacterActualWidth(curChar.ToString(), g);
 
-                DrawText(curChar.ToString(), g, X + offset - (curOffset / 2f), Y, curOffset * 2f, Height, monoFormat);
+                DrawText(curChar.ToString(), g, X + offset - (curOffset / 2f), Y, curOffset * 2f, Height, monoFormat,
+                    GetSegmentBrush(charIndex));
 
                 charIndex++;
                 offset += curOffset;
@@ -134,7 +149,40 @@ public class SimpleLabel
         }
     }
 
+    private Brush GetSegmentBrush(int characterIndex)
+    {
+        if (TextSegments == null)
+        {
+            return Brush;
+        }
+
+        int segmentStart = 0;
+        foreach (TextSegment segment in TextSegments)
+        {
+            int segmentEnd = segmentStart + segment.Text.Length;
+            if (characterIndex >= segmentStart && characterIndex < segmentEnd)
+            {
+                if (!SegmentBrushes.TryGetValue(segment.Color, out SolidBrush segmentBrush))
+                {
+                    segmentBrush = new SolidBrush(segment.Color);
+                    SegmentBrushes.Add(segment.Color, segmentBrush);
+                }
+
+                return segmentBrush;
+            }
+
+            segmentStart = segmentEnd;
+        }
+
+        return Brush;
+    }
+
     private void DrawText(string text, Graphics g, float x, float y, float width, float height, StringFormat format)
+    {
+        DrawText(text, g, x, y, width, height, format, Brush);
+    }
+
+    private void DrawText(string text, Graphics g, float x, float y, float width, float height, StringFormat format, Brush brush)
     {
         if (text != null)
         {
@@ -156,7 +204,7 @@ public class SimpleLabel
 
                 gp.AddString(text, Font.FontFamily, (int)Font.Style, fontSize, new RectangleF(x, y, width, height), format);
                 g.DrawPath(outline, gp);
-                g.FillPath(Brush, gp);
+                g.FillPath(brush, gp);
             }
             else
             {
@@ -167,7 +215,7 @@ public class SimpleLabel
                     g.DrawString(text, Font, shadowBrush, new RectangleF(x + 2f, y + 2f, width, height), format);
                 }
 
-                g.DrawString(text, Font, Brush, new RectangleF(x, y, width, height), format);
+                g.DrawString(text, Font, brush, new RectangleF(x, y, width, height), format);
             }
         }
     }

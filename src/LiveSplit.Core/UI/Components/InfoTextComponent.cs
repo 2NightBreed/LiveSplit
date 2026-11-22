@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace LiveSplit.UI.Components;
@@ -187,6 +188,9 @@ public class InfoTextComponent : IComponent
         Cache["ValueText"] = InformationValue;
         Cache["NameColor"] = NameLabel.ForeColor.ToArgb();
         Cache["ValueColor"] = ValueLabel.ForeColor.ToArgb();
+        Cache["ValueSegments"] = ValueLabel.TextSegments == null
+            ? ""
+            : string.Join("|", ValueLabel.TextSegments.Select(segment => segment.Text + ":" + segment.Color.ToArgb()));
         Cache["DisplayTwoRows"] = DisplayTwoRows;
 
         if (invalidator != null && Cache.HasChanged)

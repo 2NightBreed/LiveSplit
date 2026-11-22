@@ -50,7 +50,8 @@ public class XMLLayoutFactory : ILayoutFactory
             TransparentBackground = SettingsHelper.ParseBool(element["TransparentBackground"], false),
             TransparentBlurBackground = SettingsHelper.ParseBool(element["TransparentBlurBackground"], false),
             SlideshowTiming = SettingsHelper.ParseInt(element["SlideshowTiming"], 5),
-            GrayscaleImage = SettingsHelper.ParseBool(element["GrayscaleImage"], false)
+            GrayscaleImage = SettingsHelper.ParseBool(element["GrayscaleImage"], false),
+            RandomizeSlideshow = SettingsHelper.ParseBool(element["RandomizeSlideshow"], false),
         };
 
         if (version >= new Version(1, 3))

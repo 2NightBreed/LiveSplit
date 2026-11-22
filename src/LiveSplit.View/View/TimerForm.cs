@@ -66,6 +66,7 @@ public partial class TimerForm : Form
     private bool previousGrayscale { get; set; }
     private int slideshowImageIndex;
     private readonly System.Windows.Forms.Timer slideshowTimer;
+    private bool randomizeSlideshow => Layout.Settings.RandomizeSlideshow && Layout.Settings.BackgroundImages.Count > 2;
     private Image blurredBackground { get; set; }
     private Image bakedBackground { get; set; }
     private bool TransparentBackground
@@ -1773,7 +1774,7 @@ public partial class TimerForm : Form
             return;
         }
 
-        slideshowImageIndex = (slideshowImageIndex + 1) % images.Count;
+        slideshowImageIndex = randomizeSlideshow ? new Random().Next(0, images.Count) : (slideshowImageIndex + 1) % images.Count;
         Invalidate();
     }
 

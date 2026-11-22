@@ -40,6 +40,7 @@ public class StandardLayoutSettingsFactory : ILayoutSettingsFactory
             BackgroundImages = [],
             SlideshowTiming = 5,
             GrayscaleImage = false,
+            RandomizeSlideshow = false,
             ImageOpacity = 1f,
             ImageBlur = 0f,
             Opacity = 1,

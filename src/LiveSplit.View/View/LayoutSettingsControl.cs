@@ -49,6 +49,7 @@ public partial class LayoutSettingsControl : UserControl
         chkTransparentBackground.DataBindings.Add("Checked", Settings, "TransparentBackground", false, DataSourceUpdateMode.OnPropertyChanged);
         chkTransparentBlurBackground.DataBindings.Add("Checked", Settings, "TransparentBlurBackground", false, DataSourceUpdateMode.OnPropertyChanged);
         chkGrayscaleImage.DataBindings.Add("Checked", Settings, "GrayscaleImage", false, DataSourceUpdateMode.OnPropertyChanged);
+        chkRandomizeSlideshow.DataBindings.Add("Checked", Settings, "RandomizeSlideshow", false, DataSourceUpdateMode.OnPropertyChanged);
         btnTextColor.DataBindings.Add("BackColor", Settings, "TextColor", false, DataSourceUpdateMode.OnPropertyChanged);
         btnBackground.DataBindings.Add("BackColor", Settings, "BackgroundColor", false, DataSourceUpdateMode.OnPropertyChanged);
         btnBackground2.DataBindings.Add("BackColor", Settings, "BackgroundColor2", false, DataSourceUpdateMode.OnPropertyChanged);
@@ -103,7 +104,7 @@ public partial class LayoutSettingsControl : UserControl
         btnBackground2.Visible = selectedItem != "Blur";
         btnBackground2.DataBindings.Clear();
         lblImageOpacity.Enabled = lblBlur.Enabled = trkImageOpacity.Enabled = trkBlur.Enabled = chkGrayscaleImage.Enabled = selectedItem is "Image" or "Slideshow";
-        lblSlideshowTiming.Enabled = nmcSlideshowTiming.Enabled = selectedItem == "Slideshow";
+        lblSlideshowTiming.Enabled = nmcSlideshowTiming.Enabled = chkRandomizeSlideshow.Enabled = selectedItem == "Slideshow";
         UpdateTransparencyOptionsEnabled();
         if (selectedItem is "Image" or "Slideshow")
         {

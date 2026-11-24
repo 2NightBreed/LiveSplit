@@ -64,11 +64,20 @@ public partial class TimerForm : Form
     private float previousOpacity { get; set; }
     private float previousBlur { get; set; }
     private bool previousGrayscale { get; set; }
+    private Image backgroundAnimationSource { get; set; }
+    private Image animatedBackground { get; set; }
+    private int backgroundAnimationFrame;
+    private int bakedBackgroundAnimationFrame;
+    private int backgroundAnimationPaused;
+    private int backgroundFrameInvalidationPending;
     private int slideshowImageIndex;
     private readonly System.Windows.Forms.Timer slideshowTimer;
+    private readonly System.Windows.Forms.Timer backgroundFrameRefreshTimer;
+    private const int BackgroundFrameRefreshInterval = 17;
     private bool randomizeSlideshow => Layout.Settings.RandomizeSlideshow && Layout.Settings.BackgroundImages.Count > 2;
     private Image blurredBackground { get; set; }
     private Image bakedBackground { get; set; }
+    private Bitmap scaledBlurInput;
     private bool TransparentBackground
     {
         set
@@ -264,8 +273,15 @@ public partial class TimerForm : Form
     {
         BasePath = basePath;
         InitializeComponent();
+        VisibleChanged += TimerForm_BackgroundAnimationStateChanged;
+        Resize += TimerForm_BackgroundAnimationStateChanged;
         slideshowTimer = new System.Windows.Forms.Timer(components);
         slideshowTimer.Tick += SlideshowTimer_Tick;
+        backgroundFrameRefreshTimer = new System.Windows.Forms.Timer(components)
+        {
+            Interval = BackgroundFrameRefreshInterval
+        };
+        backgroundFrameRefreshTimer.Tick += BackgroundFrameRefreshTimer_Tick;
         Init(splitsPath, layoutPath);
     }
 
@@ -1680,18 +1696,27 @@ public partial class TimerForm : Form
     private void DrawBackground(Graphics g)
     {
         UpdateSlideshowTimer();
+        if (Layout.Settings.BackgroundType is not (BackgroundType.Image or BackgroundType.Slideshow))
+        {
+            StopBackgroundAnimation();
+        }
 
         if (Layout.Settings.BackgroundType is BackgroundType.Image or BackgroundType.Slideshow)
         {
             Image backgroundImage = GetBackgroundImage();
+            int animationFrame = UpdateBackgroundAnimation(backgroundImage);
             if (backgroundImage != null)
             {
-                if (backgroundImage != previousBackground
+                bool backgroundSettingsChanged = backgroundImage != previousBackground
                     || Layout.Settings.ImageOpacity != previousOpacity
                     || Layout.Settings.ImageBlur != previousBlur
-                    || Layout.Settings.GrayscaleImage != previousGrayscale)
+                    || Layout.Settings.GrayscaleImage != previousGrayscale;
+                bool animationFrameReady = Volatile.Read(ref backgroundFrameInvalidationPending) == 0;
+                if (backgroundSettingsChanged
+                    || (animatedBackground != null && animationFrame != bakedBackgroundAnimationFrame && animationFrameReady))
                 {
                     CreateBakedBackground(backgroundImage);
+                    bakedBackgroundAnimationFrame = animationFrame;
                 }
 
                 foreach (RectangleF rectangle in UpdateRegion.GetRegionScans(g.Transform))
@@ -1726,6 +1751,120 @@ public partial class TimerForm : Form
                 Layout.Settings.BackgroundType == BackgroundType.SolidColor ? Layout.Settings.BackgroundColor : Layout.Settings.BackgroundColor2);
             g.FillRectangle(gradientBrush, 0, 0, Size.Width, Size.Height);
         }
+    }
+
+    private int UpdateBackgroundAnimation(Image image)
+    {
+        if (Volatile.Read(ref backgroundAnimationPaused) != 0 || !Visible || WindowState == FormWindowState.Minimized)
+        {
+            StopBackgroundAnimation();
+            return Volatile.Read(ref backgroundAnimationFrame);
+        }
+
+        if (backgroundAnimationSource != image)
+        {
+            StopBackgroundAnimation();
+            backgroundAnimationSource = image;
+            if (image != null && ImageAnimator.CanAnimate(image))
+            {
+                animatedBackground = image;
+                ImageAnimator.Animate(image, BackgroundFrameChanged);
+            }
+        }
+
+        if (animatedBackground != null)
+        {
+            ImageAnimator.UpdateFrames(animatedBackground);
+        }
+
+        return Volatile.Read(ref backgroundAnimationFrame);
+    }
+
+    private void BackgroundFrameChanged(object sender, EventArgs e)
+    {
+        Interlocked.Increment(ref backgroundAnimationFrame);
+        if (IsDisposed || Disposing || !IsHandleCreated || Volatile.Read(ref backgroundAnimationPaused) != 0)
+        {
+            return;
+        }
+
+        if (Interlocked.Exchange(ref backgroundFrameInvalidationPending, 1) != 0)
+        {
+            return;
+        }
+
+        try
+        {
+            BeginInvoke((Action)ScheduleBackgroundFrameRefresh);
+        }
+        catch (InvalidOperationException) when (IsDisposed || Disposing || !IsHandleCreated)
+        {
+            Interlocked.Exchange(ref backgroundFrameInvalidationPending, 0);
+        }
+    }
+
+    private void ScheduleBackgroundFrameRefresh()
+    {
+        if (IsDisposed
+            || Disposing
+            || Volatile.Read(ref backgroundAnimationPaused) != 0
+            || !Visible
+            || WindowState == FormWindowState.Minimized
+            || animatedBackground == null)
+        {
+            Interlocked.Exchange(ref backgroundFrameInvalidationPending, 0);
+            return;
+        }
+
+        if (!backgroundFrameRefreshTimer.Enabled)
+        {
+            backgroundFrameRefreshTimer.Start();
+        }
+    }
+
+    private void BackgroundFrameRefreshTimer_Tick(object sender, EventArgs e)
+    {
+        backgroundFrameRefreshTimer.Stop();
+        Interlocked.Exchange(ref backgroundFrameInvalidationPending, 0);
+        if (!IsDisposed && !Disposing && Visible && WindowState != FormWindowState.Minimized && animatedBackground != null)
+        {
+            Invalidate();
+        }
+    }
+
+    private void TimerForm_BackgroundAnimationStateChanged(object sender, EventArgs e)
+    {
+        bool paused = !Visible || WindowState == FormWindowState.Minimized;
+        if ((Volatile.Read(ref backgroundAnimationPaused) != 0) == paused)
+        {
+            return;
+        }
+
+        Volatile.Write(ref backgroundAnimationPaused, paused ? 1 : 0);
+        if (paused)
+        {
+            StopBackgroundAnimation();
+        }
+        else
+        {
+            Invalidate();
+        }
+    }
+
+    private void StopBackgroundAnimation()
+    {
+        if (animatedBackground == null)
+        {
+            return;
+        }
+
+        ImageAnimator.StopAnimate(animatedBackground, BackgroundFrameChanged);
+        animatedBackground = null;
+        backgroundAnimationSource = null;
+        backgroundFrameRefreshTimer.Stop();
+        Interlocked.Exchange(ref backgroundFrameInvalidationPending, 0);
+        previousBackground = null;
+        bakedBackgroundAnimationFrame = -1;
     }
 
     private void UpdateSlideshowTimer()
@@ -1800,24 +1939,31 @@ public partial class TimerForm : Form
         }
 
         bool grayscale = Layout.Settings.GrayscaleImage;
-        Image image = grayscale ? LiveSplitStateHelper.ConvertImageToGrayscale(backgroundImage) : backgroundImage;
+        Image temporaryImage = grayscale ? LiveSplitStateHelper.ConvertImageToGrayscale(backgroundImage) : null;
+        Image image = temporaryImage ?? backgroundImage;
         float opacity = Layout.Settings.ImageOpacity;
         float blur = Layout.Settings.ImageBlur;
 
-        if (Layout.Settings.TransparentBackground || Layout.Settings.TransparentBlurBackground)
+        try
         {
-            image = new Bitmap(image);
-        }
+            if (Layout.Settings.TransparentBackground || Layout.Settings.TransparentBlurBackground)
+            {
+                var transparentImage = new Bitmap(image);
+                temporaryImage?.Dispose();
+                temporaryImage = transparentImage;
+                image = transparentImage;
+            }
 
-        if (image != null)
-        {
             if (blur > 0)
             {
-                if (blur != previousBlur || image != previousBackground || grayscale != previousGrayscale)
+                if (blur != previousBlur
+                    || image != previousBackground
+                    || grayscale != previousGrayscale
+                    || (animatedBackground != null && Volatile.Read(ref backgroundAnimationFrame) != bakedBackgroundAnimationFrame))
                 {
                     blurredBackground?.Dispose();
 
-                    blurredBackground = ImageBlur.Generate(image, blur * 10);
+                    blurredBackground = GenerateBackgroundBlur(image, blur * 10);
                 }
 
                 image = blurredBackground;
@@ -1835,36 +1981,101 @@ public partial class TimerForm : Form
                 croppedHeight = image.Width * (Height / (float)Width);
             }
 
-            var bitmap = new Bitmap(Width, Height, image.PixelFormat);
-
-            using (var g = Graphics.FromImage(bitmap))
+            Bitmap bitmap = bakedBackground as Bitmap;
+            bool replaceBitmap = bitmap == null
+                || bitmap.Width != Width
+                || bitmap.Height != Height
+                || bitmap.PixelFormat != image.PixelFormat;
+            if (replaceBitmap)
             {
-                var matrix = new ColorMatrix
-                {
-                    Matrix33 = opacity
-                };
-                var attributes = new ImageAttributes();
-                attributes.SetColorMatrix(matrix, ColorMatrixFlag.Default, ColorAdjustType.Bitmap);
-
-                g.InterpolationMode = InterpolationMode.HighQualityBicubic;
-                g.DrawImage(image,
-                    new Rectangle(0, 0, Width, Height),
-                    (image.Width - croppedWidth) / 2,
-                    (image.Height - croppedHeight) / 2,
-                    croppedWidth,
-                    croppedHeight,
-                    GraphicsUnit.Pixel,
-                    attributes);
+                bitmap = new Bitmap(Width, Height, image.PixelFormat);
             }
 
-            bakedBackground?.Dispose();
+            bool bitmapDrawn = false;
+            try
+            {
+                using (var g = Graphics.FromImage(bitmap))
+                {
+                    g.Clear(Color.Transparent);
+                    var matrix = new ColorMatrix
+                    {
+                        Matrix33 = opacity
+                    };
+                    using var attributes = new ImageAttributes();
+                    attributes.SetColorMatrix(matrix, ColorMatrixFlag.Default, ColorAdjustType.Bitmap);
 
-            bakedBackground = bitmap;
+                    g.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                    g.DrawImage(image,
+                        new Rectangle(0, 0, Width, Height),
+                        (image.Width - croppedWidth) / 2,
+                        (image.Height - croppedHeight) / 2,
+                        croppedWidth,
+                        croppedHeight,
+                        GraphicsUnit.Pixel,
+                        attributes);
+                }
+
+                bitmapDrawn = true;
+            }
+            finally
+            {
+                if (replaceBitmap && !bitmapDrawn)
+                {
+                    bitmap.Dispose();
+                }
+            }
+
+            if (replaceBitmap)
+            {
+                bakedBackground?.Dispose();
+                bakedBackground = bitmap;
+            }
             previousBackground = backgroundImage;
             previousOpacity = opacity;
             previousBlur = blur;
             previousGrayscale = grayscale;
         }
+        finally
+        {
+            temporaryImage?.Dispose();
+        }
+    }
+
+    private Bitmap GenerateBackgroundBlur(Image image, double sigma)
+    {
+        double scale = Math.Max(image.Width / (double)Width, image.Height / (double)Height);
+        if (scale <= 1)
+        {
+            return ImageBlur.Generate(image, sigma);
+        }
+
+        int width = Math.Max(1, (int)Math.Round(image.Width / scale));
+        int height = Math.Max(1, (int)Math.Round(image.Height / scale));
+        if (scaledBlurInput == null || scaledBlurInput.Width != width || scaledBlurInput.Height != height)
+        {
+            scaledBlurInput?.Dispose();
+            scaledBlurInput = new Bitmap(width, height, PixelFormat.Format32bppArgb);
+        }
+
+        using (var graphics = Graphics.FromImage(scaledBlurInput))
+        {
+            graphics.Clear(Color.Transparent);
+            graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
+            graphics.DrawImage(image, new Rectangle(0, 0, width, height));
+        }
+
+        return ImageBlur.Generate(scaledBlurInput, sigma / scale);
+    }
+
+    private void DisposeBackgroundResources()
+    {
+        StopBackgroundAnimation();
+        bakedBackground?.Dispose();
+        bakedBackground = null;
+        blurredBackground?.Dispose();
+        blurredBackground = null;
+        scaledBlurInput?.Dispose();
+        scaledBlurInput = null;
     }
 
     private void TimerForm_MouseDown(object sender, MouseEventArgs e)
@@ -2669,6 +2880,7 @@ public partial class TimerForm : Form
 
     private void editor_LayoutSettingsAssigned(object sender, EventArgs e)
     {
+        StopBackgroundAnimation();
         InvalidationRequired = true;
     }
 
@@ -2830,6 +3042,7 @@ public partial class TimerForm : Form
 
     private void SetLayout(ILayout layout)
     {
+        StopBackgroundAnimation();
         if (Layout != null && Layout != layout)
         {
             if (Layout.Settings.BackgroundImage != null && Layout.Settings.BackgroundImage != layout.Settings.BackgroundImage)

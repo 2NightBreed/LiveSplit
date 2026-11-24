@@ -1,0 +1,10 @@
+{
+    "LiveSplit.Core": [
+        {
+            "Name": "Model",
+            "Settings": [
+                "LastSubsplitIcon"
+            ]
+        }
+    ]
+}

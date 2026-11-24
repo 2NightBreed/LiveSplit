@@ -1,0 +1,83 @@
+{
+  "LiveSplit.Core": [
+    {
+      "Name": "Layout",
+      "Settings": [
+        "TransparentBackground",
+        "TransparentBlurBackground",
+        "BackgroundImages",
+        "SlideshowTiming",
+        "GrayscaleImage",
+        "RandomizeSlideshow"
+      ]
+    }
+  ],
+  "LiveSplit Components": [
+    {
+      "Name": "LiveSplit.Delta",
+      "Settings": [
+        "UseBestPaceEver"
+      ]
+    },
+    {
+      "Name": "LiveSplit.DetailedTimer",
+      "Settings": [
+        "LastSubsplitIcons",
+        "GrayscaleLastSplitIcon",
+        "DisplayIconAboveComparisons"
+      ]
+    },
+    {
+      "Name": "LiveSplit.Graph",
+      "Settings": [
+        "IconSize",
+        "EndPointSize",
+        "GraphDeltaColor",
+        "GraphDeltaFillColor",
+        "SplitIcons",
+        "LastSubsplitIcons",
+        "GrayscaleIcons",
+        "EndPointDeltaColor",
+        "GridlinesThickness",
+        "MainGraphThickness"
+      ]
+    },
+    {
+      "Name": "LiveSplit.PreviousSegment",
+      "Settings": [
+        "DropDecimalsPossibleTimeSave"
+      ]
+    },
+    {
+      "Name": "LiveSplit.Splits",
+      "Settings": [
+        "IsBehindCurrentSplit",
+        "IsBehindHighlightSplit"
+      ]
+    },
+    {
+      "Name": "LiveSplit.Subsplits",
+      "Settings": [
+        "IsBehindCurrentSplit",
+        "IsBehindHighlightSplit",
+        "LastSubSplitIcons"
+      ]
+    },
+    {
+      "Name": "LiveSplit.Timer",
+      "Settings": [
+        "DisplayIcon",
+        "LastSubsplitIcons",
+        "GrayscaleLastSplitIcon",
+        "IconSize"
+      ]
+    },
+    {
+      "Name": "LiveSplit.TotalPlaytime",
+      "Settings": [
+        "ShowDecimals",
+        "PlaytimeAccuracy"
+      ]
+    }
+  ]
+}

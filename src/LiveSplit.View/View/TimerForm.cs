@@ -2545,13 +2545,26 @@ public partial class TimerForm : Form
     {
         const string customSuffix = " (custom)";
 
-        if (savePath.IndexOf(customSuffix, StringComparison.Ordinal) >= 0)
+        if (Path.GetFileNameWithoutExtension(savePath).EndsWith(customSuffix, StringComparison.Ordinal))
         {
             return savePath;
         }
 
         string extension = Path.GetExtension(savePath);
         return savePath.Insert(savePath.Length - extension.Length, customSuffix);
+    }
+
+    private static string RemoveCustomSuffixFromSavePath(string savePath)
+    {
+        const string customSuffix = " (custom)";
+
+        if (!Path.GetFileNameWithoutExtension(savePath).EndsWith(customSuffix, StringComparison.Ordinal))
+        {
+            return savePath;
+        }
+
+        string extension = Path.GetExtension(savePath);
+        return savePath.Remove(savePath.Length - extension.Length - customSuffix.Length, customSuffix.Length);
     }
 
     private bool SaveSplits(bool promptPBMessage, bool suppressPrompts = false)
@@ -2622,6 +2635,11 @@ public partial class TimerForm : Form
             using var stream = File.Open(savePath, FileMode.Create, FileAccess.Write);
             stream.Write(buffer, 0, (int)memoryStream.Length);
 
+            CustomXMLFileEditor.Edit(memoryStream);
+            buffer = memoryStream.GetBuffer();
+            using var filteredStream = File.Open(RemoveCustomSuffixFromSavePath(savePath), FileMode.Create, FileAccess.Write);
+            filteredStream.Write(buffer, 0, (int)memoryStream.Length);
+
             CurrentState.Run.HasChanged = false;
 
             AddSplitsFileToLRU(savePath, stateCopy.Run, CurrentState.CurrentTimingMethod, CurrentState.CurrentHotkeyProfile);
@@ -2689,6 +2707,11 @@ public partial class TimerForm : Form
 
             using var stream = File.Open(savePath, FileMode.Create, FileAccess.Write);
             stream.Write(buffer, 0, (int)memoryStream.Length);
+
+            CustomXMLFileEditor.Edit(memoryStream);
+            buffer = memoryStream.GetBuffer();
+            using var filteredStream = File.Open(RemoveCustomSuffixFromSavePath(savePath), FileMode.Create, FileAccess.Write);
+            filteredStream.Write(buffer, 0, (int)memoryStream.Length);
 
             Layout.HasChanged = false;
 

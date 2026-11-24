@@ -16,6 +16,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Resources\CustomSplitsSettingsProperties.json" LogicalName="CustomSplitsSettings.json" />
+    <EmbeddedResource Include="Resources\CustomLayoutSettingsProperties.json" LogicalName="CustomLayoutSettings.json" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="PolySharp" Version="1.16.0" PrivateAssets="all" />
     <PackageReference Include="System.Resources.Extensions" Version="10.0.8" />
     <PackageReference Include="WindowsAPICodePack" Version="8.0.15.2" />
